@@ -1,0 +1,5 @@
+<resources>
+    <!-- Lighter/more saturated in dark theme, per Material convention, dark text on top for contrast -->
+    <color name="brand_primary">#64B5F6</color>
+    <color name="brand_on_primary">#00325C</color>
+</resources>

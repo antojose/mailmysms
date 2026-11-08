@@ -1,0 +1,21 @@
+# Local machine config - never commit, reveals local filesystem paths/username
+local.properties
+
+# Build outputs
+/build/
+/app/build/
+*.apk
+*.aab
+
+# Gradle
+.gradle/
+.kotlin/
+
+# Android Studio / IntelliJ
+*.iml
+.idea/
+captures/
+.cxx/
+
+# OS
+.DS_Store

@@ -1,0 +1,11 @@
+<resources>
+    <color name="ic_launcher_background">#1565C0</color>
+
+    <!-- Brand accent, matches the launcher icon's blue -->
+    <color name="brand_primary">#1565C0</color>
+    <color name="brand_on_primary">#FFFFFF</color>
+    <color name="header_card_bg">#262196F3</color>
+    <color name="status_success">#FF81C784</color>
+    <color name="status_failed">#FFFF6B6B</color>
+    <color name="status_pending">#FFFFB74D</color>
+</resources>
