@@ -80,8 +80,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:textSize="17sp"
-            android:textStyle="bold" />
+            android:textSize="17sp" />
 
         <TextView
             android:id="@+id/pendingStatText"
@@ -105,7 +104,7 @@
             android:id="@+id/periodStatsText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="20dp"
             android:textSize="13sp"
             android:alpha="0.75"
             android:lineSpacingExtra="4dp" />

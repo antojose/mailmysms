@@ -184,6 +184,9 @@ class HomeActivity : AppCompatActivity() {
                 setSpan(RelativeSizeSpan(1.6f), 0, numberText.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                 setSpan(ForegroundColorSpan(accentColor), 0, numberText.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                 append(" kept safe in your inbox")
+                // The view itself isn't bold (so lines 2/3 below read as clearly secondary) - only
+                // this headline line is bolded explicitly.
+                setSpan(StyleSpan(Typeface.BOLD), 0, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
 
                 // Line 2: breakdown, smaller and dimmer
                 if (breakdown != null) {
