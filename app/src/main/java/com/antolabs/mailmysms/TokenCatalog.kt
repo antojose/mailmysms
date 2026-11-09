@@ -24,7 +24,12 @@ object TokenCatalog {
         Token("sender_number_safe", "Sender address stripped to only letters/digits/+/-/. - safe for an email address's local part.", "+911234567890"),
         Token("sender_name", "Contact name if the number matches someone in Contacts, else falls back to the raw number.", "John Doe"),
         Token("sender_display", "\"Name <number>\" when a contact matched, otherwise just the number.", "John Doe <+911234567890>"),
-        Token("message_body", "The SMS text itself.", "Your OTP is 482913")
+        Token("message_body", "The SMS text itself.", "Your OTP is 482913"),
+        Token("direction", "Only set during SMS history backup: \"Incoming\" or \"Outgoing\". Blank for live SMS (always incoming).", "Outgoing"),
+        Token("counterpart_number", "The other party's number, regardless of direction. Only meaningful during SMS history backup.", "+911234567890"),
+        Token("counterpart_number_safe", "Same, stripped to only letters/digits/+/-/. for use in an email address.", "+911234567890"),
+        Token("counterpart_name", "Contact name for the other party if matched, else the raw number.", "John Doe"),
+        Token("counterpart_display", "\"Name <number>\" for the other party when a contact matched, otherwise just the number.", "John Doe <+911234567890>")
     )
 
     private val call = listOf(

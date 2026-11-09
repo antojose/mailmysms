@@ -13,6 +13,10 @@ object SettingsStore {
     private const val KEY_SMS_ENABLED = "sms_enabled"
     private const val KEY_CALLS_ENABLED = "calls_enabled"
     private const val KEY_DEVICE_LABEL = "device_label"
+    private const val KEY_SMS_BACKUP_LABEL = "sms_backup_label"
+    private const val DEFAULT_SMS_BACKUP_LABEL = "SMS Backup"
+    private const val KEY_CALL_LOG_BACKUP_LABEL = "call_log_backup_label"
+    private const val DEFAULT_CALL_LOG_BACKUP_LABEL = "Call Log Backup"
 
     private fun prefs(context: Context) = run {
         val masterKey = MasterKey.Builder(context)
@@ -55,6 +59,24 @@ object SettingsStore {
 
     fun isConfigured(context: Context): Boolean =
         emailUser(context).isNotBlank() && appPassword(context).isNotBlank()
+
+    fun smsBackupLabel(context: Context): String {
+        val saved = prefs(context).getString(KEY_SMS_BACKUP_LABEL, "") ?: ""
+        return saved.ifBlank { DEFAULT_SMS_BACKUP_LABEL }
+    }
+
+    fun saveSmsBackupLabel(context: Context, label: String) {
+        prefs(context).edit().putString(KEY_SMS_BACKUP_LABEL, label).apply()
+    }
+
+    fun callLogBackupLabel(context: Context): String {
+        val saved = prefs(context).getString(KEY_CALL_LOG_BACKUP_LABEL, "") ?: ""
+        return saved.ifBlank { DEFAULT_CALL_LOG_BACKUP_LABEL }
+    }
+
+    fun saveCallLogBackupLabel(context: Context, label: String) {
+        prefs(context).edit().putString(KEY_CALL_LOG_BACKUP_LABEL, label).apply()
+    }
 
     // --- Manual per-SIM-slot info (Android can't reliably read your own number) ---
 

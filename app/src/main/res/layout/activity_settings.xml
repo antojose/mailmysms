@@ -156,6 +156,129 @@
                 android:layout_marginTop="12dp"
                 android:text="Edit call email template" />
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:textStyle="bold"
+                android:text="Backup SMS + MMS + RCS history to email (one-time, can take hours for large histories)" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Mailbox label/folder for the backup" />
+            <EditText
+                android:id="@+id/smsBackupLabelInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:hint="SMS Backup" />
+
+            <TextView
+                android:id="@+id/smsAvailableCountText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:textStyle="italic" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/startSmsBackupButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Backup existing SMS/MMS/RCS to email" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/cancelSmsBackupButton"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Cancel SMS backup" />
+
+            <TextView
+                android:id="@+id/smsBackupStatusText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textStyle="italic" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:textStyle="bold"
+                android:text="Backup call log history to email (one-time, can take hours for large histories)" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Mailbox label/folder for the backup" />
+            <EditText
+                android:id="@+id/callLogBackupLabelInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:hint="Call Log Backup" />
+
+            <TextView
+                android:id="@+id/callLogAvailableCountText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:textStyle="italic" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/startCallLogBackupButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Backup existing call log to email" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/cancelCallLogBackupButton"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Cancel call log backup" />
+
+            <TextView
+                android:id="@+id/callLogBackupStatusText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textStyle="italic" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:textStyle="bold"
+                android:text="Local file export (no email, no internet)" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Saves XML and CSV files to this device's Download/MailMySMS-Exports folder, like SMS Backup &amp; Restore Pro does. Nothing is sent anywhere - use the email backups above for that." />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/exportLocalButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Export messages + calls to a file on this device" />
+
+            <TextView
+                android:id="@+id/exportLocalStatusText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textStyle="italic" />
+
         </LinearLayout>
 
         <com.google.android.material.button.MaterialButton

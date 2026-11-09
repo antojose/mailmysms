@@ -5,8 +5,11 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.os.PowerManager
 import android.provider.Settings
+import android.provider.Telephony
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
@@ -24,6 +27,7 @@ class SettingsActivity : AppCompatActivity() {
     private val requiredPermissions: Array<String> by lazy {
         val base = mutableListOf(
             android.Manifest.permission.RECEIVE_SMS,
+            android.Manifest.permission.READ_SMS,
             android.Manifest.permission.READ_CALL_LOG,
             android.Manifest.permission.READ_PHONE_STATE,
             android.Manifest.permission.READ_CONTACTS
@@ -44,6 +48,7 @@ class SettingsActivity : AppCompatActivity() {
             Toast.makeText(this, "Permissions granted", Toast.LENGTH_SHORT).show()
         }
         updatePermissionStatus()
+        updateAvailableCounts()
         CallMonitorService.startIfNeeded(this)
     }
 
@@ -60,6 +65,8 @@ class SettingsActivity : AppCompatActivity() {
         binding.sim1LabelInput.setText(SettingsStore.simLabel(this, 0))
         binding.sim2NumberInput.setText(SettingsStore.simNumber(this, 1))
         binding.sim2LabelInput.setText(SettingsStore.simLabel(this, 1))
+        binding.smsBackupLabelInput.setText(SettingsStore.smsBackupLabel(this))
+        binding.callLogBackupLabelInput.setText(SettingsStore.callLogBackupLabel(this))
         updateEmailButtonText()
 
         binding.emailAccountButton.setOnClickListener {
@@ -77,6 +84,8 @@ class SettingsActivity : AppCompatActivity() {
             SettingsStore.saveSimLabel(this, 0, binding.sim1LabelInput.text.toString().trim())
             SettingsStore.saveSimNumber(this, 1, binding.sim2NumberInput.text.toString().trim())
             SettingsStore.saveSimLabel(this, 1, binding.sim2LabelInput.text.toString().trim())
+            SettingsStore.saveSmsBackupLabel(this, binding.smsBackupLabelInput.text.toString().trim())
+            SettingsStore.saveCallLogBackupLabel(this, binding.callLogBackupLabelInput.text.toString().trim())
             if (binding.callsSwitch.isChecked) {
                 CallMonitorService.startIfNeeded(this)
             } else {
@@ -111,7 +120,261 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(Intent(this, TemplateActivity::class.java).putExtra(TemplateActivity.EXTRA_TYPE, TemplateActivity.TYPE_CALL))
         }
 
+        binding.startSmsBackupButton.setOnClickListener {
+            confirmAndStartSmsBackup()
+        }
+
+        binding.cancelSmsBackupButton.setOnClickListener {
+            SmsBackupService.cancel()
+            Toast.makeText(this, "Cancelling… will stop shortly", Toast.LENGTH_SHORT).show()
+        }
+
+        binding.startCallLogBackupButton.setOnClickListener {
+            confirmAndStartCallLogBackup()
+        }
+
+        binding.cancelCallLogBackupButton.setOnClickListener {
+            CallLogBackupService.cancel()
+            Toast.makeText(this, "Cancelling… will stop shortly", Toast.LENGTH_SHORT).show()
+        }
+
+        binding.exportLocalButton.setOnClickListener {
+            runLocalExport()
+        }
+
         updatePermissionStatus()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        startSmsBackupStatusPolling()
+        updateAvailableCounts()
+    }
+
+    private fun updateAvailableCounts() {
+        thread {
+            val smsCount = if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_SMS) == PackageManager.PERMISSION_GRANTED) {
+                val smsSelection = "${Telephony.Sms.TYPE} IN (${Telephony.Sms.MESSAGE_TYPE_INBOX}, ${Telephony.Sms.MESSAGE_TYPE_SENT})"
+                val sms = contentResolver.query(Telephony.Sms.CONTENT_URI, arrayOf("_id"), smsSelection, null, null)?.use { it.count } ?: 0
+                val mmsSelection = "${Telephony.Mms.MESSAGE_BOX} IN (${Telephony.Mms.MESSAGE_BOX_INBOX}, ${Telephony.Mms.MESSAGE_BOX_SENT})"
+                val mms = contentResolver.query(Telephony.Mms.CONTENT_URI, arrayOf("_id"), mmsSelection, null, null)?.use { it.count } ?: 0
+                val rcs = ImChatReader.queryAll(this).size
+                sms + mms + rcs
+            } else null
+
+            val callCount = if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_CALL_LOG) == PackageManager.PERMISSION_GRANTED) {
+                contentResolver.query(android.provider.CallLog.Calls.CONTENT_URI, arrayOf("_id"), null, null, null)?.use { it.count } ?: 0
+            } else null
+
+            runOnUiThread {
+                binding.smsAvailableCountText.text = smsCount?.let { "$it messages available on this device (SMS + MMS + RCS)" }
+                    ?: "Grant SMS permission to see available count"
+                binding.callLogAvailableCountText.text = callCount?.let { "$it call log entries available on this device" }
+                    ?: "Grant call log permission to see available count"
+            }
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        statusHandler.removeCallbacks(statusPoller)
+    }
+
+    private val statusHandler = Handler(Looper.getMainLooper())
+    private val statusPoller = object : Runnable {
+        override fun run() {
+            updateSmsBackupStatusText()
+            updateCallLogBackupStatusText()
+            statusHandler.postDelayed(this, 2000)
+        }
+    }
+
+    private fun startSmsBackupStatusPolling() {
+        statusHandler.removeCallbacks(statusPoller)
+        statusHandler.post(statusPoller)
+    }
+
+    private fun updateSmsBackupStatusText() {
+        val user = SettingsStore.emailUser(this)
+        val tracker = BackupTracker.get(this)
+        val count = tracker.importedCount(BackupTracker.TYPE_SMS, user) +
+            tracker.importedCount(BackupTracker.TYPE_MMS, user) +
+            tracker.importedCount(BackupTracker.TYPE_RCS, user)
+        binding.smsBackupStatusText.text = if (SmsBackupService.isRunning()) {
+            "Backup running… $count imported so far"
+        } else if (count > 0) {
+            "$count messages imported so far (safe to resume any time - already-sent ones won't be duplicated)"
+        } else {
+            ""
+        }
+    }
+
+    private fun updateCallLogBackupStatusText() {
+        val user = SettingsStore.emailUser(this)
+        val count = BackupTracker.get(this).importedCount(BackupTracker.TYPE_CALL, user)
+        binding.callLogBackupStatusText.text = if (CallLogBackupService.isRunning()) {
+            "Backup running… $count imported so far"
+        } else if (count > 0) {
+            "$count calls imported so far (safe to resume any time - already-sent ones won't be duplicated)"
+        } else {
+            ""
+        }
+    }
+
+    private fun formatFileSize(bytes: Long): String = when {
+        bytes >= 1024 * 1024 -> "%.1f MB".format(bytes / (1024.0 * 1024.0))
+        bytes >= 1024 -> "%.1f KB".format(bytes / 1024.0)
+        else -> "$bytes B"
+    }
+
+    private fun runLocalExport() {
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_SMS)
+            != PackageManager.PERMISSION_GRANTED ||
+            ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_CALL_LOG)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            Toast.makeText(this, "Grant SMS / call permissions first", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        binding.exportLocalButton.isEnabled = false
+        binding.exportLocalStatusText.text = "Exporting…"
+        thread {
+            val result = try {
+                LocalExporter.exportAll(this)
+            } catch (e: Exception) {
+                null
+            }
+            runOnUiThread {
+                binding.exportLocalButton.isEnabled = true
+                if (result == null) {
+                    binding.exportLocalStatusText.text = "Export failed - see logs"
+                } else {
+                    val omittedNote = if (result.omittedCount > 0) " (${result.omittedCount} omitted, because ${result.omittedReason})" else ""
+                    binding.exportLocalStatusText.text =
+                        "Exported ${result.messageCount} messages + ${result.callCount} calls to " +
+                            "Download/MailMySMS-Exports (XML + CSV)$omittedNote"
+                    val fileLines = result.files.joinToString("\n") { "• ${it.name}  (${formatFileSize(it.sizeBytes)})" }
+                    AlertDialog.Builder(this)
+                        .setTitle("Export complete")
+                        .setMessage(
+                            "${result.messageCount} messages and ${result.callCount} calls saved to " +
+                                "Download/MailMySMS-Exports/:\n\n$fileLines\n\n" +
+                                (if (result.omittedCount > 0) "${result.omittedCount} omitted, because ${result.omittedReason}.\n\n" else "") +
+                                "These files stay on this device only - nothing was sent by email."
+                        )
+                        .setPositiveButton("OK", null)
+                        .show()
+                }
+            }
+        }
+    }
+
+    private fun confirmAndStartSmsBackup() {
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_SMS)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            Toast.makeText(this, "Grant SMS / call permissions first", Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (!SettingsStore.isConfigured(this)) {
+            Toast.makeText(this, "Configure your email account first", Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (SmsBackupService.isRunning()) {
+            Toast.makeText(this, "A backup is already running", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        thread {
+            val smsSelection = "${Telephony.Sms.TYPE} IN (${Telephony.Sms.MESSAGE_TYPE_INBOX}, ${Telephony.Sms.MESSAGE_TYPE_SENT})"
+            val smsCount = contentResolver.query(
+                Telephony.Sms.CONTENT_URI, arrayOf("_id"), smsSelection, null, null
+            )?.use { it.count } ?: 0
+            val mmsSelection = "${Telephony.Mms.MESSAGE_BOX} IN (${Telephony.Mms.MESSAGE_BOX_INBOX}, ${Telephony.Mms.MESSAGE_BOX_SENT})"
+            val mmsCount = contentResolver.query(
+                Telephony.Mms.CONTENT_URI, arrayOf("_id"), mmsSelection, null, null
+            )?.use { it.count } ?: 0
+            val rcsCount = ImChatReader.queryAll(this).size
+            val count = smsCount + mmsCount + rcsCount
+            val alreadyDone = BackupTracker.get(this).let {
+                it.importedCount(BackupTracker.TYPE_SMS, SettingsStore.emailUser(this)) +
+                    it.importedCount(BackupTracker.TYPE_MMS, SettingsStore.emailUser(this)) +
+                    it.importedCount(BackupTracker.TYPE_RCS, SettingsStore.emailUser(this))
+            }
+
+            runOnUiThread {
+                if (count == 0) {
+                    Toast.makeText(this, "No SMS found to back up", Toast.LENGTH_SHORT).show()
+                    return@runOnUiThread
+                }
+                val remaining = (count - alreadyDone).coerceAtLeast(0)
+                val estimateMinutes = (remaining * 0.35 / 60).toInt().coerceAtLeast(1)
+                val resumeNote = if (alreadyDone > 0) " ($alreadyDone already backed up, won't be resent.)" else ""
+                AlertDialog.Builder(this)
+                    .setTitle(if (alreadyDone > 0) "Resume SMS backup" else "Backup existing SMS")
+                    .setMessage(
+                        "Found $count messages ($smsCount SMS, $mmsCount MMS, $rcsCount RCS).$resumeNote This will run in the " +
+                            "background as a notification and take roughly $estimateMinutes minutes, " +
+                            "possibly longer. It's safe to cancel and resume later — already-sent " +
+                            "messages won't be duplicated.\n\nContinue?"
+                    )
+                    .setPositiveButton("Start") { _, _ ->
+                        SmsBackupService.start(this)
+                        Toast.makeText(this, "Backup started", Toast.LENGTH_SHORT).show()
+                    }
+                    .setNegativeButton("Cancel", null)
+                    .show()
+            }
+        }
+    }
+
+    private fun confirmAndStartCallLogBackup() {
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_CALL_LOG)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            Toast.makeText(this, "Grant SMS / call permissions first", Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (!SettingsStore.isConfigured(this)) {
+            Toast.makeText(this, "Configure your email account first", Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (CallLogBackupService.isRunning()) {
+            Toast.makeText(this, "A backup is already running", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        thread {
+            val count = contentResolver.query(
+                android.provider.CallLog.Calls.CONTENT_URI, arrayOf("_id"), null, null, null
+            )?.use { it.count } ?: 0
+            val alreadyDone = BackupTracker.get(this).importedCount(BackupTracker.TYPE_CALL, SettingsStore.emailUser(this))
+
+            runOnUiThread {
+                if (count == 0) {
+                    Toast.makeText(this, "No call log entries found to back up", Toast.LENGTH_SHORT).show()
+                    return@runOnUiThread
+                }
+                val remaining = (count - alreadyDone).coerceAtLeast(0)
+                val estimateMinutes = (remaining * 0.35 / 60).toInt().coerceAtLeast(1)
+                val resumeNote = if (alreadyDone > 0) " ($alreadyDone already backed up, won't be resent.)" else ""
+                AlertDialog.Builder(this)
+                    .setTitle(if (alreadyDone > 0) "Resume call log backup" else "Backup existing call log")
+                    .setMessage(
+                        "Found $count call log entries.$resumeNote This will run in the " +
+                            "background as a notification and take roughly $estimateMinutes minutes, " +
+                            "possibly longer. It's safe to cancel and resume later — already-sent " +
+                            "entries won't be duplicated.\n\nContinue?"
+                    )
+                    .setPositiveButton("Start") { _, _ ->
+                        CallLogBackupService.start(this)
+                        Toast.makeText(this, "Backup started", Toast.LENGTH_SHORT).show()
+                    }
+                    .setNegativeButton("Cancel", null)
+                    .show()
+            }
+        }
     }
 
     private fun updateEmailButtonText() {
