@@ -3,77 +3,137 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>MailMySMS — your texts and call history, backed up to your own mailbox</title>
-  <meta name="description" content="MailMySMS backs up your SMS, MMS, RCS, and call history by writing them directly into your own email account over IMAP. No backup cloud, no intermediary server — just your phone and your mailbox.">
-  <link rel="icon" type="image/png" href="assets/img/favicon.png">
-  <link rel="stylesheet" href="assets/css/style.css">
-
-  <meta property="og:title" content="MailMySMS">
-  <meta property="og:description" content="Your texts and call history, backed up directly to your own mailbox. No backup cloud, no intermediary server.">
-  <meta property="og:image" content="https://mailmysms.app/assets/img/logo.png">
+  <meta name="theme-color" content="#0c111b">
+  <meta name="description" content="MailMySMS backs up your SMS, MMS, RCS, and call history by writing them directly into your own email account over IMAP. No backup cloud, no intermediary server - just your phone and your mailbox.">
+  <meta property="og:title" content="MailMySMS — Your phone. Your mailbox.">
+  <meta property="og:description" content="A little Android tool for keeping your messages and call history in your own inbox.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://mailmysms.app/">
-  <meta name="twitter:card" content="summary">
+  <meta property="og:image" content="https://mailmysms.app/assets/mailmysms-icon.webp">
+  <link rel="canonical" href="https://mailmysms.app/">
+  <link rel="icon" href="/assets/favicon.png" type="image/png">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/site.js" defer></script>
+  <title>MailMySMS — Your phone. Your mailbox. Nothing in between.</title>
 </head>
 <body>
-  <div class="wrap">
-    <header class="site">
-      <img src="assets/img/logo.png" alt="MailMySMS">
-      <span class="wordmark">MailMySMS</span>
-      <nav>
-        <a href="https://github.com/antojose/mailmysms">GitHub</a>
-        <a href="privacy.html">Privacy</a>
-      </nav>
-    </header>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <nav class="wrap nav" aria-label="Main navigation">
+      <a class="brand" href="/" aria-label="MailMySMS home"><img src="/assets/mailmysms-icon.webp" alt="" width="41" height="41"><span>MailMySMS</span></a>
+      <div class="nav-links"><a href="#how">How it works</a><a href="#features">Features</a><a href="/privacy">Privacy policy</a></div>
+      <a class="nav-cta" data-link="releases" href="#download">Get the app <span aria-hidden="true">↗</span></a>
+      <button class="menu-toggle" aria-expanded="false" aria-controls="mobile-menu" aria-label="Toggle menu">☰</button>
+    </nav>
+    <div class="mobile-menu" id="mobile-menu" hidden><a href="#how">How it works</a><a href="#features">Features</a><a href="/privacy">Privacy policy</a><a href="#download">Get the app</a></div>
+  </header>
 
-    <div class="hero">
-      <h1>Your texts and call history, backed up to your own mailbox.</h1>
-      <p class="tagline">MailMySMS connects directly to your own email account over IMAP and writes your messages and call history there. No backup cloud to sign up for. Just your phone and your mailbox.</p>
-      <div class="cta-row">
-        <a class="btn btn-primary" href="https://github.com/antojose/mailmysms/releases/latest">Download latest release</a>
-        <a class="btn btn-outline" href="https://github.com/antojose/mailmysms">View source on GitHub</a>
+  <main id="main">
+    <section class="hero wrap">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="spark"></span> A little app with a simple idea</div>
+        <h1>Your phone.<br><span>Your mailbox.</span><br>Nothing in between.</h1>
+        <p class="lead">MailMySMS archives your texts and call history by writing them directly into <strong>your own email inbox</strong> over IMAP. No separate backup cloud, no server operated by the developer in between - just a straightforward way to keep what matters.</p>
+        <div class="hero-actions"><a class="button primary" data-link="releases" href="#download">Get MailMySMS <span aria-hidden="true">↗</span></a><a class="button ghost" href="#how">See how it works <span aria-hidden="true">↓</span></a></div>
+        <div class="hero-notes">
+          <span><svg class="mini-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/><path d="m9 12 2 2 4-4"/></svg> Your mailbox, your choice</span>
+          <span><svg class="mini-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3 4 7l4 4M16 3l4 4-4 4M14 2 10 12M8 21l-4-4 4-4M16 21l4-4-4-4M10 22l4-10"/></svg> Open source</span>
+        </div>
       </div>
+      <div class="hero-art" aria-hidden="true">
+        <div class="hero-glow"></div>
+        <div class="icon-badge"><img src="/assets/mailmysms-icon.webp" alt=""></div>
+        <div class="floating-note"><span class="note-icon">✓</span><span><strong>Quietly taken care of</strong><small>Your messages, in your inbox</small></span></div>
+      </div>
+    </section>
+
+    <section class="trust-band">
+      <div class="wrap trust-inner">
+        <div><strong>No backup account to create</strong><span>Use an email address you already own.</span></div>
+        <div><strong>Direct to your mailbox</strong><span>Messages are written over IMAP.</span></div>
+        <div><strong>Keep a copy offline</strong><span>Export XML and CSV to your device.</span></div>
+      </div>
+    </section>
+
+    <section class="section wrap" id="how">
+      <div class="section-heading"><span class="kicker">THE IDEA</span><h2>Backup, without the middleman.</h2><p>MailMySMS is designed to do one job well: help you keep your phone history where you can find it, on your own terms.</p></div>
+      <div class="flow-diagram" aria-label="Phone to MailMySMS to your own mailbox">
+        <div class="flow-node"><span class="flow-emoji">▤</span><strong>Your phone</strong><small>SMS · MMS · available RCS · calls</small></div>
+        <span class="flow-arrow" aria-hidden="true">⟶</span>
+        <div class="flow-node focus"><img src="/assets/mailmysms-icon.webp" alt=""><strong>MailMySMS</strong><small>Writes over IMAP</small></div>
+        <span class="flow-arrow" aria-hidden="true">⟶</span>
+        <div class="flow-node"><span class="flow-emoji">✉</span><strong>Your inbox</strong><small>Gmail, Outlook, Yahoo, iCloud, or your own IMAP server</small></div>
+      </div>
+      <p class="flow-caption">MailMySMS doesn't route your backups through a server it operates. Your chosen email provider receives and stores the archived content, the same as any other mail in your inbox.</p>
+    </section>
+
+    <section class="section feature-section" id="features">
+      <div class="wrap">
+        <div class="section-heading"><span class="kicker">SMALL APP. USEFUL THINGS.</span><h2>The important bits, all in one place.</h2><p>From everyday forwarding to a one-time archive of years of history.</p></div>
+        <div class="feature-grid">
+          <article class="feature-card"><div class="feature-icon">↗</div><h3>Automatic forwarding</h3><p>New SMS, MMS, and call-log entries are written to your mailbox as they happen.</p></article>
+          <article class="feature-card"><div class="feature-icon">▣</div><h3>Bring your history</h3><p>Back up years of existing SMS/MMS and call-log history in one go, with built-in deduplication so re-running it never creates duplicates.</p></article>
+          <article class="feature-card"><div class="feature-icon">↓</div><h3>Local exports</h3><p>Save an XML/CSV snapshot of your messages and calls straight to your device - never uploaded anywhere.</p></article>
+          <article class="feature-card"><div class="feature-icon">⌘</div><h3>Make it yours</h3><p>Customize the mail template and label multiple SIMs on dual-SIM phones.</p></article>
+          <article class="feature-card"><div class="feature-icon">✉</div><h3>Your existing email</h3><p>Works with Gmail, Outlook, Yahoo, iCloud, or any IMAP mailbox you already have.</p></article>
+          <article class="feature-card"><div class="feature-icon">⌁</div><h3>Open to inspection</h3><p>Built as an open-source project. Read the code, report an issue, or suggest something better.</p></article>
+        </div>
+        <p class="feature-footnote">RCS backup depends on your device's own messaging app making that history available the way Android exposes SMS/MMS - not every device or app does, and when it doesn't, RCS messages are simply skipped.</p>
+      </div>
+    </section>
+
+    <section class="section wrap privacy-section" id="privacy">
+      <div class="privacy-copy">
+        <span class="kicker">PRIVACY IS THE POINT</span>
+        <h2>Not another account.<br>Not another backup cloud.</h2>
+        <p>Messages and call history are some of the most personal data on a phone. MailMySMS was built around a simpler idea: keep your archive in an inbox you already control, instead of handing it to another backup service.</p>
+        <p>The app connects to your chosen mailbox over a direct, encrypted IMAP connection. There's no analytics, no ads, and no server run by the developer that your data passes through.</p>
+        <a href="/privacy" class="inline-link">Read the full privacy policy <span aria-hidden="true">↗</span></a>
+      </div>
+      <div class="privacy-illustration">
+        <div class="safe-panel">
+          <div class="safe-top"><span class="safe-dot"></span><span class="safe-dot"></span><span class="safe-dot"></span></div>
+          <div class="safe-lock">✉</div>
+          <strong>Your inbox is the archive.</strong>
+          <span>No backup server in the middle.</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section wrap download-section" id="download">
+      <div class="download-card">
+        <div>
+          <span class="kicker">READY WHEN YOU ARE</span>
+          <h2>A little more peace of mind for your messages.</h2>
+          <p>MailMySMS is free and open source for Android. It's not yet on Google Play - download the signed APK directly from GitHub Releases.</p>
+          <div class="download-actions"><a class="button primary" data-link="releases" href="#download">Download latest release <span aria-hidden="true">↗</span></a><a class="button ghost" data-link="source" href="#download">View source <span aria-hidden="true">↗</span></a></div>
+          <small class="availability">Android 8.0 (Oreo) and up.</small>
+        </div>
+        <img src="/assets/mailmysms-icon.webp" alt="MailMySMS app icon">
+      </div>
+    </section>
+
+    <section class="section wrap maker-section">
+      <div class="maker-card">
+        <span class="kicker">A NOTE FROM THE MAKER</span>
+        <h2>Built out of a personal itch.</h2>
+        <p>I wanted an easy way to keep SMS and call history in my own inbox. One thing led to another, and this little tool grew. I build and maintain it in spare time, mostly out of curiosity and the joy of making useful things.</p>
+        <div class="maker-bottom">
+          <div><strong>Finding it useful?</strong><span>The good, the bad, the ugly — I'd love to hear it all.</span></div>
+          <div class="maker-actions"><a class="button ghost" data-link="feedback" href="#contact">Send feedback <span aria-hidden="true">↗</span></a><a class="button coffee" href="https://buymeacoffee.com/antojose" target="_blank" rel="noopener noreferrer">Buy me a coffee ☕</a></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap contact-note" id="contact"><p>Have a question or spotted something odd? <a data-link="feedback" href="#contact">Open a GitHub issue</a> or email <a href="mailto:antolabs.mailmysms@gmail.com">antolabs.mailmysms@gmail.com</a>.</p></section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <div class="footer-brand"><img src="/assets/mailmysms-icon.webp" alt="" width="35" height="35"><div><strong>MailMySMS</strong><small>A tiny tool by antojose.</small></div></div>
+      <div class="footer-links"><a href="/privacy">Privacy policy</a><a data-link="source" href="#download">Source code</a><a href="https://buymeacoffee.com/antojose" target="_blank" rel="noopener noreferrer">Buy me a coffee</a></div>
+      <small class="copyright">© <span id="year">2026</span> antojose. Built to be useful.</small>
     </div>
-
-    <section>
-      <h2 class="section-title">Why MailMySMS exists</h2>
-      <p>Your messages and call history are personal. Backing them up shouldn’t mean handing them over to yet another service or trusting an unfamiliar server with your data.</p>
-      <p>MailMySMS takes a simpler approach. It connects directly to your own email account and saves your messages and call history there over IMAP. No intermediary backup servers, no separate cloud account to sign up for. Just your phone and your mailbox.</p>
-      <p>It started as a personal itch — a simple way to keep SMS and call history safely archived in my own inbox. One thing led to another, and now it can back up years of messages, export them locally, and handle RCS messages where Android makes them accessible.</p>
-      <p>The idea remains the same: <span class="tagline-emphasis">your phone, your mailbox, nothing in between.</span></p>
-      <p>MailMySMS is open source, so anyone can inspect the code, understand how it works, and help make it better.</p>
-      <p>Built and maintained by one person in spare time, mostly out of curiosity and the joy of making useful little things.</p>
-    </section>
-
-    <section>
-      <h2 class="section-title">What it does</h2>
-      <div class="card">
-        <p style="margin-bottom:0">
-          Live SMS, MMS, and call-log forwarding to your inbox as things happen &middot;
-          one-time bulk backup of years of existing history &middot;
-          RCS messages where your phone's own messaging app stores them alongside SMS/MMS &middot;
-          local XML/CSV exports saved only to your device &middot;
-          no analytics, no ads, no account to create.
-        </p>
-      </div>
-    </section>
-
-    <section>
-      <h2 class="section-title">Support</h2>
-      <p>Found a bug, have an idea, or just want to say hi? Genuine feedback — good or bad — genuinely helps. Reach out via <a href="https://github.com/antojose/mailmysms/issues/new">GitHub Issues</a> or <a href="mailto:antolabs.mailmysms@gmail.com">email</a>.</p>
-      <p>If MailMySMS makes your life a little easier, you can always fuel the next round of tinkering with a coffee.</p>
-      <div class="cta-row" style="justify-content:flex-start">
-        <a class="btn btn-outline" href="https://buymeacoffee.com/antojose">Buy me a coffee ☕</a>
-      </div>
-    </section>
-
-    <footer class="site">
-      <span>&copy; <span id="year"></span> antojose</span>
-      <a href="privacy.html">Privacy policy</a>
-      <a href="https://github.com/antojose/mailmysms">GitHub</a>
-      <span class="spacer"></span>
-    </footer>
-  </div>
-  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+  </footer>
 </body>
 </html>

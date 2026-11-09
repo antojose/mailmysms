@@ -12,11 +12,7 @@ object AppInfo {
     const val FEEDBACK_EMAIL = "antolabs.mailmysms@gmail.com"
     const val AUTHOR = "antojose"
 
-    /**
-     * Canonical privacy policy URL, also reused for the Play Store listing. As of this writing
-     * the page itself returns a 502 (domain registered, site not live yet) - the About screen
-     * links here anyway at the user's request, pending the site going up.
-     */
+    /** Canonical privacy policy URL. Also reused for the Play Store listing. Served from docs/ in this repo via GitHub Pages. */
     const val PRIVACY_POLICY_URL = "https://mailmysms.app/privacy"
 
     fun versionName(context: Context): String =

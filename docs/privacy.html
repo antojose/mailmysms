@@ -3,26 +3,30 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Privacy Policy — MailMySMS</title>
+  <meta name="theme-color" content="#0c111b">
   <meta name="description" content="MailMySMS privacy policy: what data the app accesses, why, and exactly where it goes.">
-  <link rel="icon" type="image/png" href="assets/img/favicon.png">
-  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="canonical" href="https://mailmysms.app/privacy">
+  <link rel="icon" href="/assets/favicon.png" type="image/png">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/site.js" defer></script>
+  <title>Privacy Policy — MailMySMS</title>
 </head>
 <body>
-  <div class="wrap policy">
-    <header class="site">
-      <img src="assets/img/logo.png" alt="MailMySMS">
-      <span class="wordmark">MailMySMS</span>
-      <nav>
-        <a href="index.html">Home</a>
-        <a href="https://github.com/antojose/mailmysms">GitHub</a>
-      </nav>
-    </header>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <nav class="wrap nav" aria-label="Main navigation">
+      <a class="brand" href="/" aria-label="MailMySMS home"><img src="/assets/mailmysms-icon.webp" alt="" width="41" height="41"><span>MailMySMS</span></a>
+      <div class="nav-links"><a href="/#how">How it works</a><a href="/#features">Features</a><a href="/privacy" aria-current="page">Privacy policy</a></div>
+      <a class="nav-cta" href="/">Back to home</a>
+      <button class="menu-toggle" aria-expanded="false" aria-controls="mobile-menu" aria-label="Toggle menu">☰</button>
+    </nav>
+    <div class="mobile-menu" id="mobile-menu" hidden><a href="/">Home</a><a href="/#features">Features</a><a href="/privacy">Privacy policy</a></div>
+  </header>
 
-    <a class="back-link" href="index.html">&larr; Back to MailMySMS</a>
-
+  <main id="main" class="document wrap">
+    <span class="kicker">YOUR DATA, YOUR CHOICE</span>
     <h1>Privacy Policy</h1>
-    <p class="updated">Last updated: November 9, 2026</p>
+    <p class="meta">Last updated: November 9, 2026</p>
 
     <p>MailMySMS ("the app") is built, maintained, and this policy is written, by one independent developer — not a company. This page explains, plainly, what data the app accesses on your device, what it does with it, and what it never does.</p>
 
@@ -40,7 +44,7 @@
       <li><strong>Network state and internet access</strong> — to connect to your email provider's IMAP server.</li>
       <li><strong>Storage</strong> (on Android 9 and below only) — to write local export files to your device's Downloads folder. On newer Android versions this uses the system's scoped Downloads API instead, which needs no special permission.</li>
     </ul>
-    <p>MailMySMS requests each permission only when the corresponding feature (live forwarding, call-log forwarding, or local export) is actually enabled — not all at once, and not for anything unrelated to what you turned on.</p>
+    <p>MailMySMS requests each permission only when the corresponding feature (live forwarding, call-log forwarding, or local export) is actually enabled — not all at once, and not for anything unrelated to what you turned on. You can revoke any permission at any time from Android's app settings; the corresponding feature simply stops working until it's granted again.</p>
 
     <h2>Where your data goes</h2>
     <p>Your email account credentials (address and app password) are encrypted on-device using Android's EncryptedSharedPreferences (AES-256), and used only to open a direct, encrypted (IMAPS) connection to the mail server you specify. Each message or call record is written straight into your mailbox as an email, using IMAP's APPEND command — the same operation an email client uses to save a draft. There is no email actually sent through SMTP, and no server run by the developer that your data passes through, is logged by, or is stored on.</p>
@@ -72,13 +76,15 @@
     <h2>Contact</h2>
     <p>Questions about this policy or how MailMySMS handles data: <a href="mailto:antolabs.mailmysms@gmail.com">antolabs.mailmysms@gmail.com</a> or <a href="https://github.com/antojose/mailmysms/issues/new">open a GitHub issue</a>.</p>
 
-    <footer class="site">
-      <span>&copy; <span id="year"></span> antojose</span>
-      <a href="index.html">Home</a>
-      <a href="https://github.com/antojose/mailmysms">GitHub</a>
-      <span class="spacer"></span>
-    </footer>
-  </div>
-  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+    <a class="back-link" href="/">← Back to MailMySMS</a>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <div class="footer-brand"><img src="/assets/mailmysms-icon.webp" alt="" width="35" height="35"><div><strong>MailMySMS</strong><small>A tiny tool by antojose.</small></div></div>
+      <div class="footer-links"><a href="/">Home</a><a href="https://buymeacoffee.com/antojose" target="_blank" rel="noopener noreferrer">Buy me a coffee</a></div>
+      <small class="copyright">© <span id="year">2026</span> antojose.</small>
+    </div>
+  </footer>
 </body>
 </html>
