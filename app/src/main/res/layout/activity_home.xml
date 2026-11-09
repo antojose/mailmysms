@@ -136,7 +136,7 @@
             android:layout_marginTop="4dp"
             android:textSize="13sp"
             android:alpha="0.75"
-            android:text="Good, bad or ugly — genuine feedback helps a lot." />
+            android:text="The good, the bad, the ugly — I'd love to hear it all. Your feedback helps make MailMySMS better." />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/feedbackButton"
@@ -150,7 +150,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:textStyle="bold"
-            android:text="Like what MailMySMS does for you?" />
+            android:text="Want to keep the little improvements coming?" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -158,7 +158,7 @@
             android:layout_marginTop="4dp"
             android:textSize="13sp"
             android:alpha="0.75"
-            android:text="If you're ever feeling generous, it helps keep this going." />
+            android:text="If MailMySMS makes your life a little easier, you can always fuel the next round of tinkering with a coffee. ☕" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/coffeeButton"
@@ -166,7 +166,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:text="Buy me a coffee" />
+            android:text="Buy me a coffee ☕" />
 
     </LinearLayout>
 </ScrollView>
