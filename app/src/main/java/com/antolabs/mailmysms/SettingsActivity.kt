@@ -58,6 +58,13 @@ class SettingsActivity : AppCompatActivity() {
         setContentView(binding.root)
         title = "Settings"
 
+        // Previously only (re)started from the permission-grant callback or "Save settings" -
+        // meaning a service that died for any other reason (e.g. the app process being killed)
+        // stayed dead until the user happened to hit one of those, even after reopening this exact
+        // screen. startIfNeeded() is already a no-op when disabled/unconfigured/permission-missing,
+        // so this is safe to call unconditionally on every visit.
+        CallMonitorService.startIfNeeded(this)
+
         binding.deviceLabelInput.setText(SettingsStore.deviceLabel(this))
         binding.smsSwitch.isChecked = SettingsStore.smsEnabled(this)
         binding.callsSwitch.isChecked = SettingsStore.callsEnabled(this)

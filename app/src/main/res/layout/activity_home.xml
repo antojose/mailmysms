@@ -15,7 +15,7 @@
             android:orientation="horizontal"
             android:gravity="center_vertical"
             android:background="@drawable/bg_header_card"
-            android:padding="20dp">
+            android:padding="16dp">
 
             <ImageView
                 android:layout_width="52dp"
@@ -104,16 +104,59 @@
             android:id="@+id/periodStatsText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="16dp"
             android:textSize="13sp"
             android:alpha="0.75"
             android:lineSpacingExtra="4dp" />
 
+        <!-- Operational confidence: compact, at-a-glance "is this actually working right now"
+             status - deliberately not a card, not a shield icon, and visually secondary to the
+             value-delivered numbers above (smaller text, no background). Tappable only when
+             there's something to act on. -->
+        <LinearLayout
+            android:id="@+id/backupStatusContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:minHeight="48dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/backupStatusIcon"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_marginEnd="10dp"
+                android:contentDescription="@null" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/backupStatusLine1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/backupStatusLine2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="1dp"
+                    android:textSize="11sp"
+                    android:alpha="0.65" />
+
+            </LinearLayout>
+
+        </LinearLayout>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
+            android:layout_marginTop="20dp"
             android:textStyle="bold"
             android:text="Recent mails sent" />
         <LinearLayout

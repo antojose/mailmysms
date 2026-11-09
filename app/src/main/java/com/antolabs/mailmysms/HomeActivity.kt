@@ -54,6 +54,99 @@ class HomeActivity : AppCompatActivity() {
         renderStats()
         renderRecentEvents()
         renderPendingWork()
+        renderBackupStatus()
+    }
+
+    private sealed class BackupStatus {
+        /** lastDeliveredMillis is null when forwarding is on and healthy but nothing has been
+         *  confirmed delivered yet (e.g. right after setup) - that's still "active," just with
+         *  nothing to timestamp. Never fabricate a time here. */
+        data class Active(val lastDeliveredMillis: Long?) : BackupStatus()
+        object Paused : BackupStatus()
+        data class ActionNeeded(val reason: String) : BackupStatus()
+        object Unknown : BackupStatus()
+    }
+
+    /** Derives current operational health from actual state (permissions, service liveness, the
+     *  live-forwarding event history) rather than just echoing the on/off toggles - a toggle being
+     *  on proves nothing about whether sending actually works right now. Deliberately does not
+     *  treat a past successful delivery as a guarantee of future background execution; it only
+     *  reports what's verifiable at this moment.
+     *
+     *  Known gap: a message currently mid-retry (WorkManager backoff, not yet exhausted) isn't
+     *  visible here - EventLog only gets a row once a send finally succeeds or exhausts its
+     *  retries, so a transient failure that's still retrying doesn't show as "action needed." That
+     *  in-flight count is surfaced separately by renderPendingWork()/pendingStatText, which is the
+     *  honest way to communicate "pending" per the brief, rather than this indicator guessing. */
+    private fun computeBackupStatus(): BackupStatus = try {
+        val smsOn = SettingsStore.smsEnabled(this)
+        val callsOn = SettingsStore.callsEnabled(this)
+
+        if (!smsOn && !callsOn) {
+            BackupStatus.Paused
+        } else if (smsOn && ContextCompat.checkSelfPermission(this, android.Manifest.permission.RECEIVE_SMS) !=
+            android.content.pm.PackageManager.PERMISSION_GRANTED
+        ) {
+            BackupStatus.ActionNeeded("SMS permission required")
+        } else if (callsOn && (
+                ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_PHONE_STATE) !=
+                    android.content.pm.PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_CALL_LOG) !=
+                    android.content.pm.PackageManager.PERMISSION_GRANTED
+            )
+        ) {
+            BackupStatus.ActionNeeded("Call log permission required")
+        } else if (callsOn && !CallMonitorService.isRunning()) {
+            BackupStatus.ActionNeeded("Call monitoring isn't running — reopen Settings")
+        } else {
+            val log = EventLog.get(this)
+            val mostRecent = log.recent(1).firstOrNull()
+            if (mostRecent != null && !mostRecent.success) {
+                BackupStatus.ActionNeeded(
+                    if (mostRecent.authFailure) "Mailbox sign-in needs attention" else "Recent delivery failed — check Settings"
+                )
+            } else {
+                BackupStatus.Active(log.mostRecentSuccess()?.timestamp)
+            }
+        }
+    } catch (e: Exception) {
+        BackupStatus.Unknown
+    }
+
+    private data class StatusDisplay(val icon: Int, val line1: String, val line2: String, val actionable: Boolean)
+
+    private fun renderBackupStatus() {
+        val status = computeBackupStatus()
+        val now = System.currentTimeMillis()
+
+        val display = when (status) {
+            is BackupStatus.Active -> {
+                val sub = status.lastDeliveredMillis?.let {
+                    "Last delivered ${DateUtils.getRelativeTimeSpanString(it, now, DateUtils.MINUTE_IN_MILLIS)}"
+                } ?: "Waiting for the first message"
+                StatusDisplay(R.drawable.ic_status_check, "Backup active", sub, actionable = false)
+            }
+            BackupStatus.Paused -> StatusDisplay(
+                R.drawable.ic_status_pause, "Backup paused", "Turn on SMS or call forwarding in Settings", actionable = true
+            )
+            is BackupStatus.ActionNeeded ->
+                StatusDisplay(R.drawable.ic_status_alert, "Action needed", status.reason, actionable = true)
+            BackupStatus.Unknown ->
+                StatusDisplay(R.drawable.ic_status_unknown, "Checking status…", "Couldn't verify right now", actionable = false)
+        }
+
+        binding.backupStatusIcon.setImageResource(display.icon)
+        binding.backupStatusLine1.text = display.line1
+        binding.backupStatusLine2.text = display.line2
+        binding.backupStatusContainer.isClickable = display.actionable
+        binding.backupStatusContainer.background = if (display.actionable) {
+            val outValue = android.util.TypedValue()
+            theme.resolveAttribute(android.R.attr.selectableItemBackground, outValue, true)
+            ContextCompat.getDrawable(this, outValue.resourceId)
+        } else null
+        binding.backupStatusContainer.setOnClickListener(
+            if (display.actionable) View.OnClickListener { startActivity(Intent(this, SettingsActivity::class.java)) } else null
+        )
     }
 
     private fun renderPendingWork() {
@@ -209,7 +302,7 @@ class HomeActivity : AppCompatActivity() {
                 append(exportNumberText)
                 setSpan(RelativeSizeSpan(1.6f), exportLineStart, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                 setSpan(ForegroundColorSpan(accentColor), exportLineStart, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                append(" exported locally to this device")
+                append(" records saved as local backups")
                 setSpan(StyleSpan(Typeface.BOLD), exportLineStart, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             }
         }
@@ -217,7 +310,7 @@ class HomeActivity : AppCompatActivity() {
 
     private fun renderRecentEvents() {
         binding.recentEventsContainer.removeAllViews()
-        val events = EventLog.get(this).recent(5)
+        val events = EventLog.get(this).recent(3)
 
         if (events.isEmpty()) {
             binding.recentEventsContainer.addView(

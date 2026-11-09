@@ -18,7 +18,8 @@ class CallLogWorker(appContext: Context, params: WorkerParameters) : Worker(appC
         } catch (e: Exception) {
             Log.e(TAG, "doWork failed", e)
             if (runAttemptCount >= MAX_ATTEMPTS) {
-                EventLog.get(applicationContext).record("CALL", "Call log lookup failed: ${e.message}", false)
+                val authFailure = e is javax.mail.AuthenticationFailedException
+                EventLog.get(applicationContext).record("CALL", "Call log lookup failed: ${e.message}", false, authFailure = authFailure)
                 Result.failure()
             } else {
                 Result.retry()

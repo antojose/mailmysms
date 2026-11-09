@@ -10,7 +10,11 @@ data class EventRecord(
     val type: String,
     val summary: String,
     val success: Boolean,
-    val timestamp: Long
+    val timestamp: Long,
+    // Specifically a mailbox-login rejection (javax.mail.AuthenticationFailedException), as
+    // opposed to a network/transient failure - lets the UI say "sign-in needs attention" instead
+    // of a generic "delivery failed" when that's precisely what happened.
+    val authFailure: Boolean = false
 )
 
 class EventLog private constructor(context: Context) :
@@ -23,7 +27,8 @@ class EventLog private constructor(context: Context) :
                 "type TEXT NOT NULL, " +
                 "summary TEXT NOT NULL, " +
                 "success INTEGER NOT NULL, " +
-                "timestamp INTEGER NOT NULL)"
+                "timestamp INTEGER NOT NULL, " +
+                "auth_failure INTEGER NOT NULL DEFAULT 0)"
         )
     }
 
@@ -32,12 +37,19 @@ class EventLog private constructor(context: Context) :
         onCreate(db)
     }
 
-    fun record(type: String, summary: String, success: Boolean, timestamp: Long = System.currentTimeMillis()) {
+    fun record(
+        type: String,
+        summary: String,
+        success: Boolean,
+        timestamp: Long = System.currentTimeMillis(),
+        authFailure: Boolean = false
+    ) {
         val values = ContentValues().apply {
             put("type", type)
             put("summary", summary)
             put("success", if (success) 1 else 0)
             put("timestamp", timestamp)
+            put("auth_failure", if (authFailure) 1 else 0)
         }
         writableDatabase.insert("events", null, values)
         trim()
@@ -77,7 +89,8 @@ class EventLog private constructor(context: Context) :
                         type = cursor.getString(cursor.getColumnIndexOrThrow("type")),
                         summary = cursor.getString(cursor.getColumnIndexOrThrow("summary")),
                         success = cursor.getInt(cursor.getColumnIndexOrThrow("success")) == 1,
-                        timestamp = cursor.getLong(cursor.getColumnIndexOrThrow("timestamp"))
+                        timestamp = cursor.getLong(cursor.getColumnIndexOrThrow("timestamp")),
+                        authFailure = cursor.getInt(cursor.getColumnIndexOrThrow("auth_failure")) == 1
                     )
                 )
             }
@@ -85,9 +98,27 @@ class EventLog private constructor(context: Context) :
         return list
     }
 
+    /** Most recent event across all types that actually succeeded - "last confirmed successful
+     *  mailbox write", not just the most recent attempt regardless of outcome. */
+    fun mostRecentSuccess(): EventRecord? {
+        readableDatabase.query(
+            "events", null, "success = 1", null, null, null, "timestamp DESC", "1"
+        ).use { cursor ->
+            if (!cursor.moveToFirst()) return null
+            return EventRecord(
+                id = cursor.getLong(cursor.getColumnIndexOrThrow("id")),
+                type = cursor.getString(cursor.getColumnIndexOrThrow("type")),
+                summary = cursor.getString(cursor.getColumnIndexOrThrow("summary")),
+                success = true,
+                timestamp = cursor.getLong(cursor.getColumnIndexOrThrow("timestamp")),
+                authFailure = false
+            )
+        }
+    }
+
     companion object {
         private const val DB_NAME = "event_log.db"
-        private const val DB_VERSION = 1
+        private const val DB_VERSION = 2
 
         @Volatile private var instance: EventLog? = null
 

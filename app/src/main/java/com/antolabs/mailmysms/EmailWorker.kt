@@ -31,7 +31,8 @@ class EmailWorker(appContext: Context, params: WorkerParameters) : Worker(appCon
             Result.success()
         } catch (e: Exception) {
             if (runAttemptCount >= MAX_ATTEMPTS) {
-                EventLog.get(applicationContext).record("SMS", summary, false, timestamp)
+                val authFailure = e is javax.mail.AuthenticationFailedException
+                EventLog.get(applicationContext).record("SMS", summary, false, timestamp, authFailure)
                 Result.failure()
             } else {
                 Result.retry()

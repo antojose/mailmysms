@@ -41,7 +41,7 @@ class CallMonitorService : Service() {
         super.onCreate()
         Log.d(TAG, "onCreate")
         startForegroundWithNotification()
-        startListening()
+        running = startListening()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int = START_STICKY
@@ -50,6 +50,7 @@ class CallMonitorService : Service() {
 
     override fun onDestroy() {
         stopListening()
+        running = false
         super.onDestroy()
     }
 
@@ -78,17 +79,19 @@ class CallMonitorService : Service() {
         }
     }
 
-    private fun startListening() {
+    /** Returns whether the listener actually got registered - the single source of truth for
+     *  whether this service is doing anything, not just alive. */
+    private fun startListening(): Boolean {
         val granted = ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_PHONE_STATE) ==
             PackageManager.PERMISSION_GRANTED
         Log.d(TAG, "startListening: READ_PHONE_STATE granted=$granted, sdkInt=${Build.VERSION.SDK_INT}")
         if (!granted) {
             stopSelf()
-            return
+            return false
         }
         val tm = getSystemService(TELEPHONY_SERVICE) as? TelephonyManager
         Log.d(TAG, "startListening: telephonyManager=${tm != null}")
-        if (tm == null) return
+        if (tm == null) return false
         telephonyManager = tm
 
         try {
@@ -118,7 +121,9 @@ class CallMonitorService : Service() {
             }
         } catch (e: Exception) {
             Log.e(TAG, "Failed to register call state listener", e)
+            return false
         }
+        return true
     }
 
     private fun stopListening() {
@@ -153,6 +158,12 @@ class CallMonitorService : Service() {
     companion object {
         private const val TAG = "CallMonitorService"
         private const val NOTIFICATION_ID = 42
+
+        @Volatile private var running = false
+
+        /** Whether the listener is actually registered right now - not just whether the service
+         *  process is alive, which [startListening] can fail inside while the service survives. */
+        fun isRunning() = running
 
         fun startIfNeeded(context: Context) {
             if (!SettingsStore.callsEnabled(context) || !SettingsStore.isConfigured(context)) return
