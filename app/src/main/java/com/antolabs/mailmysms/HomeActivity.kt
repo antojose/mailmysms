@@ -333,7 +333,7 @@ class HomeActivity : AppCompatActivity() {
                     setSpan(android.text.style.ForegroundColorSpan(0x99FFFFFF.toInt()), timeStart, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                 }
                 setPadding(0, 20, 0, 20)
-                textSize = 12f
+                textSize = 14f
             }
             binding.recentEventsContainer.addView(row)
             binding.recentEventsContainer.addView(
