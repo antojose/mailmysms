@@ -29,7 +29,14 @@ class BackupNotifications(
         }
     }
 
+    @Volatile var lastDone: Int = 0
+        private set
+    @Volatile var lastTotal: Int = 0
+        private set
+
     fun update(done: Int, total: Int, finished: Boolean = false) {
+        lastDone = done
+        lastTotal = total
         val manager = service.getSystemService(NotificationManager::class.java)
         manager?.notify(notificationId, build(done, total, finished))
     }

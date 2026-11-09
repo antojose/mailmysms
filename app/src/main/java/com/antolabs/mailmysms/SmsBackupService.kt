@@ -180,6 +180,9 @@ class SmsBackupService : Service() {
 
         fun isRunning() = running
 
+        /** (done, total) for the run in progress, or (0, 0) if nothing is running. */
+        fun progress(): Pair<Int, Int> = notifications?.let { it.lastDone to it.lastTotal } ?: (0 to 0)
+
         fun start(context: Context) {
             if (running) return
             context.startForegroundService(Intent(context, SmsBackupService::class.java))

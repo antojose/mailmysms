@@ -30,7 +30,7 @@ object MmsReader {
     private const val ADDR_TYPE_FROM = 137
     private const val ADDR_TYPE_TO = 151
 
-    fun queryAll(context: Context): List<MmsEntry> {
+    fun queryAll(context: Context, onProgress: ((Int) -> Unit)? = null): List<MmsEntry> {
         val result = mutableListOf<MmsEntry>()
         val projection = arrayOf("_id", Telephony.Mms.DATE, Telephony.Mms.THREAD_ID, Telephony.Mms.SUBSCRIPTION_ID)
         val selection = "${Telephony.Mms.MESSAGE_BOX} IN (${Telephony.Mms.MESSAGE_BOX_INBOX}, ${Telephony.Mms.MESSAGE_BOX_SENT})"
@@ -44,6 +44,7 @@ object MmsReader {
             val threadIdx = it.getColumnIndexOrThrow(Telephony.Mms.THREAD_ID)
             val subIdx = it.getColumnIndexOrThrow(Telephony.Mms.SUBSCRIPTION_ID)
 
+            var done = 0
             while (it.moveToNext()) {
                 val id = it.getLong(idIdx)
                 // Mms.DATE is in seconds, unlike Sms.DATE which is in milliseconds.
@@ -69,6 +70,8 @@ object MmsReader {
                         attachmentCount = attachmentCount
                     )
                 )
+                done++
+                onProgress?.invoke(done)
             }
         }
         return result

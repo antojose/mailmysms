@@ -17,6 +17,9 @@ object SettingsStore {
     private const val DEFAULT_SMS_BACKUP_LABEL = "SMS Backup"
     private const val KEY_CALL_LOG_BACKUP_LABEL = "call_log_backup_label"
     private const val DEFAULT_CALL_LOG_BACKUP_LABEL = "Call Log Backup"
+    private const val KEY_LAST_LOCAL_EXPORT_MESSAGES = "last_local_export_messages"
+    private const val KEY_LAST_LOCAL_EXPORT_CALLS = "last_local_export_calls"
+    private const val KEY_LAST_LOCAL_EXPORT_TIME = "last_local_export_time"
 
     private fun prefs(context: Context) = run {
         val masterKey = MasterKey.Builder(context)
@@ -76,6 +79,26 @@ object SettingsStore {
 
     fun saveCallLogBackupLabel(context: Context, label: String) {
         prefs(context).edit().putString(KEY_CALL_LOG_BACKUP_LABEL, label).apply()
+    }
+
+    data class LastLocalExport(val messageCount: Int, val callCount: Int, val timeMillis: Long)
+
+    fun lastLocalExport(context: Context): LastLocalExport? {
+        val time = prefs(context).getLong(KEY_LAST_LOCAL_EXPORT_TIME, 0L)
+        if (time == 0L) return null
+        return LastLocalExport(
+            prefs(context).getInt(KEY_LAST_LOCAL_EXPORT_MESSAGES, 0),
+            prefs(context).getInt(KEY_LAST_LOCAL_EXPORT_CALLS, 0),
+            time
+        )
+    }
+
+    fun saveLastLocalExport(context: Context, messageCount: Int, callCount: Int) {
+        prefs(context).edit()
+            .putInt(KEY_LAST_LOCAL_EXPORT_MESSAGES, messageCount)
+            .putInt(KEY_LAST_LOCAL_EXPORT_CALLS, callCount)
+            .putLong(KEY_LAST_LOCAL_EXPORT_TIME, System.currentTimeMillis())
+            .apply()
     }
 
     // --- Manual per-SIM-slot info (Android can't reliably read your own number) ---

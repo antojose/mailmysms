@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
+import android.provider.Telephony
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -31,14 +32,42 @@ object LocalExporter {
     private const val EXPORT_SUBDIR = "MailMySMS-Exports"
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
 
-    fun exportAll(context: Context): LocalExportResult {
+    /** onProgress reports (done, total) across the whole export - reading plus writing. */
+    fun exportAll(context: Context, onProgress: (Int, Int) -> Unit = { _, _ -> }): LocalExportResult {
         val timestamp = SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.US).format(Date())
 
+        // A rough upfront total so progress is meaningful from the first callback - MMS reading
+        // (one sub-query per message for addresses, another for parts) is by far the slowest
+        // phase, so that's the one with real per-row granularity; the others are fast enough that
+        // jumping the counter at phase boundaries reads fine.
+        val smsSelection = "${Telephony.Sms.TYPE} IN (${Telephony.Sms.MESSAGE_TYPE_INBOX}, ${Telephony.Sms.MESSAGE_TYPE_SENT})"
+        val smsCountEstimate = context.contentResolver.query(Telephony.Sms.CONTENT_URI, arrayOf("_id"), smsSelection, null, null)?.use { it.count } ?: 0
+        val mmsSelection = "${Telephony.Mms.MESSAGE_BOX} IN (${Telephony.Mms.MESSAGE_BOX_INBOX}, ${Telephony.Mms.MESSAGE_BOX_SENT})"
+        val mmsCountEstimate = context.contentResolver.query(Telephony.Mms.CONTENT_URI, arrayOf("_id"), mmsSelection, null, null)?.use { it.count } ?: 0
+        val callCountEstimate = context.contentResolver.query(android.provider.CallLog.Calls.CONTENT_URI, arrayOf("_id"), null, null, null)?.use { it.count } ?: 0
+        val rcsCountEstimate = context.contentResolver.query(Uri.parse("content://im/chat"), arrayOf("_id"), null, null, null)?.use { it.count } ?: 0
+        val writeSteps = 4 // the 4 output files, counted as one progress step each once written
+        val total = (smsCountEstimate + mmsCountEstimate + callCountEstimate + rcsCountEstimate + writeSteps).coerceAtLeast(1)
+        var done = 0
+
         val sms = SmsReader.queryAll(context)
-        val mms = MmsReader.queryAll(context)
+        done += sms.size
+        onProgress(done, total)
+
+        val mms = MmsReader.queryAll(context) { mmsDone ->
+            onProgress(done + mmsDone, total)
+        }
+        done += mms.size
+        onProgress(done, total)
+
         val rcsResult = ImChatReader.queryAllWithOmitted(context)
         val rcs = rcsResult.entries
+        done += rcs.size + rcsResult.omittedSystemEvents
+        onProgress(done, total)
+
         val calls = CallLogReader.queryAll(context)
+        done += calls.size
+        onProgress(done, total)
 
         val messageCount = sms.size + mms.size + rcs.size
         val messagesXml = buildMessagesXml(sms, mms, rcs, messageCount)
@@ -52,11 +81,13 @@ object LocalExporter {
         val callsCsvName = "mailmysms-calls_$timestamp.csv"
 
         val files = listOfNotNull(
-            writeFile(context, messagesXmlName, "text/xml", messagesXml),
-            writeFile(context, messagesCsvName, "text/csv", CsvUtils.UTF8_BOM + messagesCsv),
-            writeFile(context, callsXmlName, "text/xml", callsXml),
-            writeFile(context, callsCsvName, "text/csv", CsvUtils.UTF8_BOM + callsCsv)
+            writeFile(context, messagesXmlName, "text/xml", messagesXml).also { done++; onProgress(done, total) },
+            writeFile(context, messagesCsvName, "text/csv", CsvUtils.UTF8_BOM + messagesCsv).also { done++; onProgress(done, total) },
+            writeFile(context, callsXmlName, "text/xml", callsXml).also { done++; onProgress(done, total) },
+            writeFile(context, callsCsvName, "text/csv", CsvUtils.UTF8_BOM + callsCsv).also { done++; onProgress(done, total) }
         )
+
+        SettingsStore.saveLastLocalExport(context, messageCount, calls.size)
 
         return LocalExportResult(
             files, messageCount, calls.size, rcsResult.omittedSystemEvents,

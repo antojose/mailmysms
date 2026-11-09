@@ -201,7 +201,8 @@ class SettingsActivity : AppCompatActivity() {
             tracker.importedCount(BackupTracker.TYPE_MMS, user) +
             tracker.importedCount(BackupTracker.TYPE_RCS, user)
         binding.smsBackupStatusText.text = if (SmsBackupService.isRunning()) {
-            "Backup running… $count imported so far"
+            val (done, total) = SmsBackupService.progress()
+            if (total > 0) "Backup running… ${done * 100 / total}% ($done/$total)" else "Backup running…"
         } else if (count > 0) {
             "$count messages imported so far (safe to resume any time - already-sent ones won't be duplicated)"
         } else {
@@ -213,7 +214,8 @@ class SettingsActivity : AppCompatActivity() {
         val user = SettingsStore.emailUser(this)
         val count = BackupTracker.get(this).importedCount(BackupTracker.TYPE_CALL, user)
         binding.callLogBackupStatusText.text = if (CallLogBackupService.isRunning()) {
-            "Backup running… $count imported so far"
+            val (done, total) = CallLogBackupService.progress()
+            if (total > 0) "Backup running… ${done * 100 / total}% ($done/$total)" else "Backup running…"
         } else if (count > 0) {
             "$count calls imported so far (safe to resume any time - already-sent ones won't be duplicated)"
         } else {
@@ -240,8 +242,20 @@ class SettingsActivity : AppCompatActivity() {
         binding.exportLocalButton.isEnabled = false
         binding.exportLocalStatusText.text = "Exporting…"
         thread {
+            var lastUiUpdate = 0L
             val result = try {
-                LocalExporter.exportAll(this)
+                LocalExporter.exportAll(this) { done, total ->
+                    // The callback can fire thousands of times a second during the MMS read
+                    // phase - throttle UI updates so it doesn't flood the main thread.
+                    val now = System.currentTimeMillis()
+                    if (now - lastUiUpdate >= 150) {
+                        lastUiUpdate = now
+                        val pct = (done * 100 / total)
+                        runOnUiThread {
+                            binding.exportLocalStatusText.text = "Exporting… $pct% ($done/$total)"
+                        }
+                    }
+                }
             } catch (e: Exception) {
                 null
             }

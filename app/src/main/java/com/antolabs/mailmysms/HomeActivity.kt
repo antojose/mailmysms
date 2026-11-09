@@ -54,6 +54,41 @@ class HomeActivity : AppCompatActivity() {
         renderStats()
         renderRecentEvents()
         renderPendingWork()
+        renderBulkStats()
+    }
+
+    private fun renderBulkStats() {
+        val user = SettingsStore.emailUser(this)
+        val tracker = BackupTracker.get(this)
+        val bulkMessages = tracker.importedCount(BackupTracker.TYPE_SMS, user) +
+            tracker.importedCount(BackupTracker.TYPE_MMS, user) +
+            tracker.importedCount(BackupTracker.TYPE_RCS, user)
+        val bulkCalls = tracker.importedCount(BackupTracker.TYPE_CALL, user)
+        val lastExport = SettingsStore.lastLocalExport(this)
+
+        val lines = mutableListOf<String>()
+        if (bulkMessages > 0 || bulkCalls > 0) {
+            val parts = mutableListOf<String>()
+            if (bulkMessages > 0) parts.add("$bulkMessages older message${if (bulkMessages == 1) "" else "s"}")
+            if (bulkCalls > 0) parts.add("$bulkCalls older call${if (bulkCalls == 1) "" else "s"}")
+            lines.add("Plus ${parts.joinToString(" and ")} backed up to email from your history")
+        }
+        if (lastExport != null) {
+            val whenText = DateUtils.getRelativeTimeSpanString(
+                lastExport.timeMillis, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS
+            )
+            lines.add(
+                "Last local export: ${lastExport.messageCount} messages + ${lastExport.callCount} calls " +
+                    "saved to this device ($whenText)"
+            )
+        }
+
+        if (lines.isEmpty()) {
+            binding.bulkStatsText.visibility = View.GONE
+        } else {
+            binding.bulkStatsText.visibility = View.VISIBLE
+            binding.bulkStatsText.text = lines.joinToString("\n")
+        }
     }
 
     private fun renderPendingWork() {
