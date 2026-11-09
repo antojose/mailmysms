@@ -15,7 +15,6 @@ class AboutActivity : AppCompatActivity() {
 
         binding.githubButton.setOnClickListener { AppInfo.openUrl(this, AppInfo.GITHUB_URL) }
         binding.coffeeButton.setOnClickListener { AppInfo.openUrl(this, AppInfo.COFFEE_URL) }
-        binding.feedbackButton.setOnClickListener { AppInfo.openUrl(this, "${AppInfo.GITHUB_URL}/issues/new") }
-        binding.feedbackEmailButton.setOnClickListener { AppInfo.sendFeedbackEmail(this) }
+        binding.feedbackButton.setOnClickListener { AppInfo.showFeedbackDialog(this) }
     }
 }

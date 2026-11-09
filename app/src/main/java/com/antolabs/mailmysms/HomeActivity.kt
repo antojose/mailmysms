@@ -10,7 +10,6 @@ import android.text.style.RelativeSizeSpan
 import android.text.style.StyleSpan
 import android.graphics.Typeface
 import android.view.View
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import android.widget.LinearLayout
@@ -44,7 +43,7 @@ class HomeActivity : AppCompatActivity() {
         binding.aboutIconButton.setOnClickListener {
             startActivity(Intent(this, AboutActivity::class.java))
         }
-        binding.feedbackButton.setOnClickListener { showFeedbackDialog() }
+        binding.feedbackButton.setOnClickListener { AppInfo.showFeedbackDialog(this) }
         binding.coffeeButton.setOnClickListener { AppInfo.openUrl(this, AppInfo.COFFEE_URL) }
     }
 
@@ -171,19 +170,6 @@ class HomeActivity : AppCompatActivity() {
                 }
             }
         }
-    }
-
-    private fun showFeedbackDialog() {
-        AlertDialog.Builder(this)
-            .setTitle("How's MailMySMS working for you?")
-            .setMessage(
-                "Found a bug, have an idea, or just want to say hi? " +
-                    "Genuine feedback — good or bad — genuinely helps."
-            )
-            .setPositiveButton("GitHub Issues") { _, _ -> AppInfo.openUrl(this, "${AppInfo.GITHUB_URL}/issues/new") }
-            .setNegativeButton("Email") { _, _ -> AppInfo.sendFeedbackEmail(this) }
-            .setNeutralButton("Not now", null)
-            .show()
     }
 
     private fun renderStats() {

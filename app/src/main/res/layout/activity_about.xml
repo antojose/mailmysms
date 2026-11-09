@@ -79,21 +79,27 @@
             android:layout_height="0dp"
             android:layout_weight="1" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/feedbackButton"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_width="match_parent"
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="Send feedback (GitHub Issues)" />
+            android:layout_marginTop="16dp"
+            android:textStyle="bold"
+            android:text="Finding MailMySMS useful?" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textSize="13sp"
+            android:alpha="0.75"
+            android:text="The good, the bad, the ugly — I'd love to hear it all. Your feedback helps make MailMySMS better." />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/feedbackEmailButton"
-            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:id="@+id/feedbackButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:text="Send feedback (Email)" />
+            android:text="Send feedback" />
 
         <TextView
             android:layout_width="wrap_content"

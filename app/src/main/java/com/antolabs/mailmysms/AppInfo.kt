@@ -1,8 +1,10 @@
 package com.antolabs.mailmysms
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import androidx.appcompat.app.AlertDialog
 
 object AppInfo {
     const val GITHUB_URL = "https://github.com/antojose/mailmysms"
@@ -28,5 +30,18 @@ object AppInfo {
             putExtra(Intent.EXTRA_SUBJECT, "MailMySMS feedback")
         }
         context.startActivity(Intent.createChooser(intent, "Send feedback"))
+    }
+
+    fun showFeedbackDialog(activity: Activity) {
+        AlertDialog.Builder(activity)
+            .setTitle("How's MailMySMS working for you?")
+            .setMessage(
+                "Found a bug, have an idea, or just want to say hi? " +
+                    "Genuine feedback — good or bad — genuinely helps."
+            )
+            .setPositiveButton("GitHub Issues") { _, _ -> openUrl(activity, "$GITHUB_URL/issues/new") }
+            .setNegativeButton("Email") { _, _ -> sendFeedbackEmail(activity) }
+            .setNeutralButton("Not now", null)
+            .show()
     }
 }
