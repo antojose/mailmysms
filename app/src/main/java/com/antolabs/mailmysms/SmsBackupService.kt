@@ -56,20 +56,24 @@ class SmsBackupService : Service() {
         try {
             notifier.updatePhase("Connecting to your mailbox…")
             appender = ResilientAppender(TAG, gmailUser, appPassword, imapHost, imapPort, folderName)
+            currentAppender = appender
 
             notifier.updatePhase("Checking what's already backed up…")
             val existingMessageIds = appender.fetchExistingMessageIds()
+            if (cancelled) return
 
             notifier.updatePhase("Reading SMS history…")
             val items = mutableListOf<HistoryItem>()
             items.addAll(SmsReader.queryAll(context).map {
                 HistoryItem.Sms(it.id, it.address, it.body, it.dateMillis, it.threadId, it.subId, it.isOutgoing)
             })
+            if (cancelled) return
 
             notifier.updatePhase("Reading MMS history… this is the slow part, hang tight")
             items.addAll(MmsReader.queryAll(context) { mmsDone ->
                 if (mmsDone % 50 == 0) notifier.updatePhase("Reading MMS history… ${mmsDone.grouped()} read so far")
             }.map { HistoryItem.Mms(it) })
+            if (cancelled) return
 
             notifier.updatePhase("Reading RCS history…")
             items.addAll(ImChatReader.queryAll(context).map { HistoryItem.Rcs(it) })
@@ -150,6 +154,7 @@ class SmsBackupService : Service() {
             notifier.update(count, count, finished = true)
         } finally {
             appender?.close()
+            currentAppender = null
             running = false
             stopForeground(STOP_FOREGROUND_DETACH)
             stopSelf()
@@ -187,6 +192,7 @@ class SmsBackupService : Service() {
         @Volatile private var running = false
         @Volatile private var cancelled = false
         @Volatile private var notifications: BackupNotifications? = null
+        @Volatile private var currentAppender: ResilientAppender? = null
 
         fun isRunning() = running
 
@@ -199,8 +205,15 @@ class SmsBackupService : Service() {
             context.startForegroundService(Intent(context, SmsBackupService::class.java))
         }
 
+        /** Setting the flag alone isn't enough: the run may be blocked inside a single synchronous
+         *  IMAP call (fetching existing Message-IDs, or an append) with no opportunity to check it.
+         *  Forcibly closing the in-flight connection unblocks that call via an IOException, same as
+         *  any other dropped connection the retry logic already handles - closing is itself a
+         *  network round-trip (IMAP LOGOUT), so it runs off the calling (likely UI) thread. */
         fun cancel() {
             cancelled = true
+            val appender = currentAppender
+            if (appender != null) thread { appender.close() }
         }
     }
 }

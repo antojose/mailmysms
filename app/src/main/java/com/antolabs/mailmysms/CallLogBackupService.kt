@@ -43,9 +43,11 @@ class CallLogBackupService : Service() {
         try {
             notifier.updatePhase("Connecting to your mailbox…")
             appender = ResilientAppender(TAG, gmailUser, appPassword, imapHost, imapPort, folderName)
+            currentAppender = appender
 
             notifier.updatePhase("Checking what's already backed up…")
             val existingMessageIds = appender.fetchExistingMessageIds()
+            if (cancelled) return
 
             notifier.updatePhase("Reading call log history…")
             val calls = CallLogReader.queryAll(context)
@@ -94,6 +96,7 @@ class CallLogBackupService : Service() {
             notifier.update(count, count, finished = true)
         } finally {
             appender?.close()
+            currentAppender = null
             running = false
             stopForeground(STOP_FOREGROUND_DETACH)
             stopSelf()
@@ -116,6 +119,7 @@ class CallLogBackupService : Service() {
         @Volatile private var running = false
         @Volatile private var cancelled = false
         @Volatile private var notifications: BackupNotifications? = null
+        @Volatile private var currentAppender: ResilientAppender? = null
 
         fun isRunning() = running
 
@@ -128,8 +132,15 @@ class CallLogBackupService : Service() {
             context.startForegroundService(Intent(context, CallLogBackupService::class.java))
         }
 
+        /** Setting the flag alone isn't enough: the run may be blocked inside a single synchronous
+         *  IMAP call (fetching existing Message-IDs, or an append) with no opportunity to check it.
+         *  Forcibly closing the in-flight connection unblocks that call via an IOException, same as
+         *  any other dropped connection the retry logic already handles - closing is itself a
+         *  network round-trip (IMAP LOGOUT), so it runs off the calling (likely UI) thread. */
         fun cancel() {
             cancelled = true
+            val appender = currentAppender
+            if (appender != null) thread { appender.close() }
         }
     }
 }
