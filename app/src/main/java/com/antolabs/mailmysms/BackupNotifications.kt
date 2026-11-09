@@ -55,6 +55,31 @@ class BackupNotifications(
         manager?.notify(notificationId, buildPhase(text))
     }
 
+    /** Always call exactly once as a run ends, however it ends (completed, cancelled, or errored
+     *  out) - leaves a clean, dismissable notification behind instead of whatever ongoing phase/
+     *  progress state happened to be showing at the moment the run stopped. Without this, a run
+     *  cancelled mid-phase (e.g. "Checking what's already backed up…") left that ongoing - and
+     *  therefore non-swipeable - notification stuck forever, looking identical to still running. */
+    fun finish(done: Int, total: Int, cancelled: Boolean) {
+        lastDone = done
+        lastTotal = total
+        lastPhase = null
+        val text = if (cancelled) {
+            if (done > 0) "Backup cancelled - ${done.grouped()} $noun sent before stopping" else "Backup cancelled"
+        } else {
+            "Backed up ${done.grouped()} of ${total.grouped()} $noun"
+        }
+        val notification = NotificationCompat.Builder(service, channelId)
+            .setContentTitle("MailMySMS")
+            .setContentText(text)
+            .setSmallIcon(R.mipmap.ic_launcher_monochrome)
+            .setOngoing(false)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .build()
+        val manager = service.getSystemService(NotificationManager::class.java)
+        manager?.notify(notificationId, notification)
+    }
+
     private fun build(done: Int, total: Int, finished: Boolean): Notification {
         val pct = if (total > 0) (done * 100 / total) else 0
         val text = if (finished) {

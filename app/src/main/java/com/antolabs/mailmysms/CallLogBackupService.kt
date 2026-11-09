@@ -40,6 +40,8 @@ class CallLogBackupService : Service() {
         val notifier = notifications!!
 
         var appender: ResilientAppender? = null
+        var done = 0
+        var total = 0
         try {
             notifier.updatePhase("Connecting to your mailbox…")
             appender = ResilientAppender(TAG, gmailUser, appPassword, imapHost, imapPort, folderName)
@@ -51,8 +53,7 @@ class CallLogBackupService : Service() {
 
             notifier.updatePhase("Reading call log history…")
             val calls = CallLogReader.queryAll(context)
-            val total = calls.size
-            var done = 0
+            total = calls.size
 
             for (call in calls) {
                 if (cancelled) break
@@ -88,15 +89,15 @@ class CallLogBackupService : Service() {
                 done++
                 if (done % 20 == 0) notifier.update(done, total)
             }
-
-            notifier.update(done, total, finished = true)
         } catch (e: Exception) {
             Log.e(TAG, "Backup run failed", e)
             val count = tracker.importedCount(BackupTracker.TYPE_CALL, gmailUser)
-            notifier.update(count, count, finished = true)
+            done = count
+            total = maxOf(total, count)
         } finally {
             appender?.close()
             currentAppender = null
+            notifier.finish(done, total, cancelled)
             running = false
             stopForeground(STOP_FOREGROUND_DETACH)
             stopSelf()

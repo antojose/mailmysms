@@ -53,6 +53,8 @@ class SmsBackupService : Service() {
         val notifier = notifications!!
 
         var appender: ResilientAppender? = null
+        var done = 0
+        var total = 0
         try {
             notifier.updatePhase("Connecting to your mailbox…")
             appender = ResilientAppender(TAG, gmailUser, appPassword, imapHost, imapPort, folderName)
@@ -79,8 +81,7 @@ class SmsBackupService : Service() {
             items.addAll(ImChatReader.queryAll(context).map { HistoryItem.Rcs(it) })
             items.sortBy { it.dateMillis }
 
-            val total = items.size
-            var done = 0
+            total = items.size
             val threadReferences = mutableMapOf<String, MutableList<String>>()
 
             for (item in items) {
@@ -144,17 +145,17 @@ class SmsBackupService : Service() {
                 done++
                 if (done % 20 == 0) notifier.update(done, total)
             }
-
-            notifier.update(done, total, finished = true)
         } catch (e: Exception) {
             Log.e(TAG, "Backup run failed", e)
             val count = tracker.importedCount(BackupTracker.TYPE_SMS, gmailUser) +
                 tracker.importedCount(BackupTracker.TYPE_MMS, gmailUser) +
                 tracker.importedCount(BackupTracker.TYPE_RCS, gmailUser)
-            notifier.update(count, count, finished = true)
+            done = count
+            total = maxOf(total, count)
         } finally {
             appender?.close()
             currentAppender = null
+            notifier.finish(done, total, cancelled)
             running = false
             stopForeground(STOP_FOREGROUND_DETACH)
             stopSelf()
