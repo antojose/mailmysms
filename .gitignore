@@ -1,6 +1,9 @@
 # Local machine config - never commit, reveals local filesystem paths/username
 local.properties
 
+# Release signing key and passwords - never commit, keep an external backup
+release-signing/
+
 # Build outputs
 /build/
 /app/build/
