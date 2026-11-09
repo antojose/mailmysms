@@ -1,5 +1,8 @@
 package com.antolabs.mailmysms
 
+/** Thousands-grouped display string, e.g. 29427 -> "29,427". */
+fun Int.grouped(): String = "%,d".format(this)
+
 object XmlUtils {
     // Control characters in this range are simply illegal in XML 1.0 regardless of escaping -
     // a message body containing one (rare, but it happens) would otherwise produce a file that

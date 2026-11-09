@@ -167,9 +167,9 @@ class SettingsActivity : AppCompatActivity() {
             } else null
 
             runOnUiThread {
-                binding.smsAvailableCountText.text = smsCount?.let { "$it messages available on this device (SMS + MMS + RCS)" }
+                binding.smsAvailableCountText.text = smsCount?.let { "${it.grouped()} messages available on this device (SMS + MMS + RCS)" }
                     ?: "Grant SMS permission to see available count"
-                binding.callLogAvailableCountText.text = callCount?.let { "$it call log entries available on this device" }
+                binding.callLogAvailableCountText.text = callCount?.let { "${it.grouped()} call log entries available on this device" }
                     ?: "Grant call log permission to see available count"
             }
         }
@@ -202,9 +202,9 @@ class SettingsActivity : AppCompatActivity() {
             tracker.importedCount(BackupTracker.TYPE_RCS, user)
         binding.smsBackupStatusText.text = if (SmsBackupService.isRunning()) {
             val (done, total) = SmsBackupService.progress()
-            if (total > 0) "Backup running… ${done * 100 / total}% ($done/$total)" else "Backup running…"
+            if (total > 0) "Backup running… ${done * 100 / total}% (${done.grouped()}/${total.grouped()})" else "Backup running…"
         } else if (count > 0) {
-            "$count messages imported so far (safe to resume any time - already-sent ones won't be duplicated)"
+            "${count.grouped()} messages imported so far (safe to resume any time - already-sent ones won't be duplicated)"
         } else {
             ""
         }
@@ -215,9 +215,9 @@ class SettingsActivity : AppCompatActivity() {
         val count = BackupTracker.get(this).importedCount(BackupTracker.TYPE_CALL, user)
         binding.callLogBackupStatusText.text = if (CallLogBackupService.isRunning()) {
             val (done, total) = CallLogBackupService.progress()
-            if (total > 0) "Backup running… ${done * 100 / total}% ($done/$total)" else "Backup running…"
+            if (total > 0) "Backup running… ${done * 100 / total}% (${done.grouped()}/${total.grouped()})" else "Backup running…"
         } else if (count > 0) {
-            "$count calls imported so far (safe to resume any time - already-sent ones won't be duplicated)"
+            "${count.grouped()} calls imported so far (safe to resume any time - already-sent ones won't be duplicated)"
         } else {
             ""
         }
@@ -252,7 +252,7 @@ class SettingsActivity : AppCompatActivity() {
                         lastUiUpdate = now
                         val pct = (done * 100 / total)
                         runOnUiThread {
-                            binding.exportLocalStatusText.text = "Exporting… $pct% ($done/$total)"
+                            binding.exportLocalStatusText.text = "Exporting… $pct% (${done.grouped()}/${total.grouped()})"
                         }
                     }
                 }
@@ -264,17 +264,17 @@ class SettingsActivity : AppCompatActivity() {
                 if (result == null) {
                     binding.exportLocalStatusText.text = "Export failed - see logs"
                 } else {
-                    val omittedNote = if (result.omittedCount > 0) " (${result.omittedCount} omitted, because ${result.omittedReason})" else ""
+                    val omittedNote = if (result.omittedCount > 0) " (${result.omittedCount.grouped()} omitted, because ${result.omittedReason})" else ""
                     binding.exportLocalStatusText.text =
-                        "Exported ${result.messageCount} messages + ${result.callCount} calls to " +
+                        "Exported ${result.messageCount.grouped()} messages + ${result.callCount.grouped()} calls to " +
                             "Download/MailMySMS-Exports (XML + CSV)$omittedNote"
                     val fileLines = result.files.joinToString("\n") { "• ${it.name}  (${formatFileSize(it.sizeBytes)})" }
                     AlertDialog.Builder(this)
                         .setTitle("Export complete")
                         .setMessage(
-                            "${result.messageCount} messages and ${result.callCount} calls saved to " +
+                            "${result.messageCount.grouped()} messages and ${result.callCount.grouped()} calls saved to " +
                                 "Download/MailMySMS-Exports/:\n\n$fileLines\n\n" +
-                                (if (result.omittedCount > 0) "${result.omittedCount} omitted, because ${result.omittedReason}.\n\n" else "") +
+                                (if (result.omittedCount > 0) "${result.omittedCount.grouped()} omitted, because ${result.omittedReason}.\n\n" else "") +
                                 "These files stay on this device only - nothing was sent by email."
                         )
                         .setPositiveButton("OK", null)
@@ -324,11 +324,11 @@ class SettingsActivity : AppCompatActivity() {
                 }
                 val remaining = (count - alreadyDone).coerceAtLeast(0)
                 val estimateMinutes = (remaining * 0.35 / 60).toInt().coerceAtLeast(1)
-                val resumeNote = if (alreadyDone > 0) " ($alreadyDone already backed up, won't be resent.)" else ""
+                val resumeNote = if (alreadyDone > 0) " (${alreadyDone.grouped()} already backed up, won't be resent.)" else ""
                 AlertDialog.Builder(this)
                     .setTitle(if (alreadyDone > 0) "Resume SMS backup" else "Backup existing SMS")
                     .setMessage(
-                        "Found $count messages ($smsCount SMS, $mmsCount MMS, $rcsCount RCS).$resumeNote This will run in the " +
+                        "Found ${count.grouped()} messages (${smsCount.grouped()} SMS, ${mmsCount.grouped()} MMS, ${rcsCount.grouped()} RCS).$resumeNote This will run in the " +
                             "background as a notification and take roughly $estimateMinutes minutes, " +
                             "possibly longer. It's safe to cancel and resume later — already-sent " +
                             "messages won't be duplicated.\n\nContinue?"
@@ -372,11 +372,11 @@ class SettingsActivity : AppCompatActivity() {
                 }
                 val remaining = (count - alreadyDone).coerceAtLeast(0)
                 val estimateMinutes = (remaining * 0.35 / 60).toInt().coerceAtLeast(1)
-                val resumeNote = if (alreadyDone > 0) " ($alreadyDone already backed up, won't be resent.)" else ""
+                val resumeNote = if (alreadyDone > 0) " (${alreadyDone.grouped()} already backed up, won't be resent.)" else ""
                 AlertDialog.Builder(this)
                     .setTitle(if (alreadyDone > 0) "Resume call log backup" else "Backup existing call log")
                     .setMessage(
-                        "Found $count call log entries.$resumeNote This will run in the " +
+                        "Found ${count.grouped()} call log entries.$resumeNote This will run in the " +
                             "background as a notification and take roughly $estimateMinutes minutes, " +
                             "possibly longer. It's safe to cancel and resume later — already-sent " +
                             "entries won't be duplicated.\n\nContinue?"

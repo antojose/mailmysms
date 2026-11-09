@@ -38,10 +38,10 @@ class HomeActivity : AppCompatActivity() {
 
         binding.headerMetaText.text = "by ${AppInfo.AUTHOR} · v${AppInfo.versionName(this)}"
 
-        binding.settingsButton.setOnClickListener {
+        binding.settingsIconButton.setOnClickListener {
             startActivity(Intent(this, SettingsActivity::class.java))
         }
-        binding.aboutButton.setOnClickListener {
+        binding.aboutIconButton.setOnClickListener {
             startActivity(Intent(this, AboutActivity::class.java))
         }
         binding.feedbackButton.setOnClickListener { showFeedbackDialog() }
@@ -54,41 +54,6 @@ class HomeActivity : AppCompatActivity() {
         renderStats()
         renderRecentEvents()
         renderPendingWork()
-        renderBulkStats()
-    }
-
-    private fun renderBulkStats() {
-        val user = SettingsStore.emailUser(this)
-        val tracker = BackupTracker.get(this)
-        val bulkMessages = tracker.importedCount(BackupTracker.TYPE_SMS, user) +
-            tracker.importedCount(BackupTracker.TYPE_MMS, user) +
-            tracker.importedCount(BackupTracker.TYPE_RCS, user)
-        val bulkCalls = tracker.importedCount(BackupTracker.TYPE_CALL, user)
-        val lastExport = SettingsStore.lastLocalExport(this)
-
-        val lines = mutableListOf<String>()
-        if (bulkMessages > 0 || bulkCalls > 0) {
-            val parts = mutableListOf<String>()
-            if (bulkMessages > 0) parts.add("$bulkMessages older message${if (bulkMessages == 1) "" else "s"}")
-            if (bulkCalls > 0) parts.add("$bulkCalls older call${if (bulkCalls == 1) "" else "s"}")
-            lines.add("Plus ${parts.joinToString(" and ")} backed up to email from your history")
-        }
-        if (lastExport != null) {
-            val whenText = DateUtils.getRelativeTimeSpanString(
-                lastExport.timeMillis, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS
-            )
-            lines.add(
-                "Last local export: ${lastExport.messageCount} messages + ${lastExport.callCount} calls " +
-                    "saved to this device ($whenText)"
-            )
-        }
-
-        if (lines.isEmpty()) {
-            binding.bulkStatsText.visibility = View.GONE
-        } else {
-            binding.bulkStatsText.visibility = View.VISIBLE
-            binding.bulkStatsText.text = lines.joinToString("\n")
-        }
     }
 
     private fun renderPendingWork() {
@@ -131,16 +96,35 @@ class HomeActivity : AppCompatActivity() {
     private fun renderStats() {
         val log = EventLog.get(this)
 
+        // Live per-event forwarding, tracked since the app was installed (trimmed to the last
+        // 60 days for the period breakdown further down, but the all-time counts here aren't).
         val allTimeTotal = log.countSince(0L)
         val allTimeSuccess = log.countSince(0L, successOnly = true)
         val allTimeFailed = allTimeTotal - allTimeSuccess
         val allTimeSms = log.countSince(0L, type = "SMS")
         val allTimeCalls = log.countSince(0L, type = "CALL")
 
-        binding.headlineStatText.text = if (allTimeTotal == 0) {
+        // Bulk one-time backup to email: a different mechanism (SmsBackupService/
+        // CallLogBackupService) from live forwarding, but the same kind of outcome - the message
+        // durably sits in the user's email. Folded into the same headline total for that reason;
+        // failure tracking above stays scoped to live forwarding only, since the bulk tracker
+        // only records successful imports.
+        val user = SettingsStore.emailUser(this)
+        val tracker = BackupTracker.get(this)
+        val bulkMessages = tracker.importedCount(BackupTracker.TYPE_SMS, user) +
+            tracker.importedCount(BackupTracker.TYPE_MMS, user) +
+            tracker.importedCount(BackupTracker.TYPE_RCS, user)
+        val bulkCalls = tracker.importedCount(BackupTracker.TYPE_CALL, user)
+
+        val heroTotal = allTimeTotal + bulkMessages + bulkCalls
+        val heroSms = allTimeSms + bulkMessages
+        val heroCalls = allTimeCalls + bulkCalls
+        val lastExport = SettingsStore.lastLocalExport(this)
+
+        binding.headlineStatText.text = if (heroTotal == 0 && lastExport == null) {
             "Nothing forwarded yet — send yourself a text to see it in action."
         } else {
-            buildHeroStatText(allTimeTotal, allTimeSms, allTimeCalls)
+            buildHeroStatText(heroTotal, heroSms, heroCalls, lastExport)
         }
 
         if (allTimeFailed > 0) {
@@ -169,32 +153,58 @@ class HomeActivity : AppCompatActivity() {
         ).joinToString("   ·   ")
     }
 
-    private fun buildHeroStatText(total: Int, sms: Int, callLogs: Int): SpannableStringBuilder {
-        val numberText = total.toString()
+    private fun buildHeroStatText(
+        total: Int,
+        sms: Int,
+        callLogs: Int,
+        lastExport: SettingsStore.LastLocalExport?
+    ): SpannableStringBuilder {
         val accentColor = ContextCompat.getColor(this, R.color.brand_primary)
         val dimColor = 0x99FFFFFF.toInt()
+        val exportColor = 0xCCFFFFFF.toInt()
 
         val smsPart = "$sms SMS"
         val callPart = "$callLogs call log${if (callLogs == 1) "" else "s"}"
         val breakdown = when {
             sms > 0 && callLogs > 0 -> "$smsPart · $callPart"
             sms > 0 -> smsPart
-            else -> callPart
+            callLogs > 0 -> callPart
+            else -> null
         }
 
-        return SpannableStringBuilder().apply {
-            // Line 1: big number + value statement
-            append(numberText)
-            setSpan(RelativeSizeSpan(1.6f), 0, numberText.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-            setSpan(ForegroundColorSpan(accentColor), 0, numberText.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-            append(" kept safe in your inbox")
-            append("\n")
+        val exportCount = (lastExport?.messageCount ?: 0) + (lastExport?.callCount ?: 0)
 
-            // Line 2: breakdown, smaller and dimmer
-            val breakdownStart = length
-            append(breakdown)
-            setSpan(RelativeSizeSpan(0.8f), breakdownStart, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-            setSpan(ForegroundColorSpan(dimColor), breakdownStart, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        return SpannableStringBuilder().apply {
+            // Line 1: big number + value statement - only when there's something to show here;
+            // a device with nothing live-forwarded or bulk-backed-up but a local export still
+            // shouldn't claim "0 kept safe in your inbox".
+            if (total > 0) {
+                val numberText = total.grouped()
+                append(numberText)
+                setSpan(RelativeSizeSpan(1.6f), 0, numberText.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                setSpan(ForegroundColorSpan(accentColor), 0, numberText.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                append(" kept safe in your inbox")
+
+                // Line 2: breakdown, smaller and dimmer
+                if (breakdown != null) {
+                    append("\n")
+                    val breakdownStart = length
+                    append(breakdown)
+                    setSpan(RelativeSizeSpan(0.8f), breakdownStart, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    setSpan(ForegroundColorSpan(dimColor), breakdownStart, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                }
+            }
+
+            // Line 3: local export count - same headline tier as "kept safe", but deliberately
+            // not folded into that number or that phrasing: a local export is a point-in-time
+            // file on this device, not durable off-device protection the way email is.
+            if (exportCount > 0) {
+                if (total > 0) append("\n")
+                val exportStart = length
+                append("Plus ${exportCount.grouped()} exported locally to this device")
+                setSpan(RelativeSizeSpan(0.8f), exportStart, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                setSpan(ForegroundColorSpan(exportColor), exportStart, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
         }
     }
 
