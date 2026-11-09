@@ -161,7 +161,6 @@ class HomeActivity : AppCompatActivity() {
     ): SpannableStringBuilder {
         val accentColor = ContextCompat.getColor(this, R.color.brand_primary)
         val dimColor = 0x99FFFFFF.toInt()
-        val exportColor = 0xCCFFFFFF.toInt()
 
         val smsPart = "$sms SMS"
         val callPart = "$callLogs call log${if (callLogs == 1) "" else "s"}"
@@ -198,15 +197,20 @@ class HomeActivity : AppCompatActivity() {
                 }
             }
 
-            // Line 3: local export count - same headline tier as "kept safe", but deliberately
-            // not folded into that number or that phrasing: a local export is a point-in-time
-            // file on this device, not durable off-device protection the way email is.
+            // A second, parallel headline - not a footnote on the one above. Deliberately not
+            // folded into that number or phrasing (a local export is a point-in-time file on this
+            // device, not durable off-device protection the way email is), but for many users this
+            // is by far the bigger number, so it earns the same big-number/bold treatment, on its
+            // own line with a blank line of separation, not a smaller "Plus ..." tacked on below.
             if (exportCount > 0) {
-                if (total > 0) append("\n")
-                val exportStart = length
-                append("Plus ${exportCount.grouped()} exported locally to this device")
-                setSpan(RelativeSizeSpan(0.8f), exportStart, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                setSpan(ForegroundColorSpan(exportColor), exportStart, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                if (total > 0) append("\n\n")
+                val exportNumberText = exportCount.grouped()
+                val exportLineStart = length
+                append(exportNumberText)
+                setSpan(RelativeSizeSpan(1.6f), exportLineStart, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                setSpan(ForegroundColorSpan(accentColor), exportLineStart, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                append(" exported locally to this device")
+                setSpan(StyleSpan(Typeface.BOLD), exportLineStart, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             }
         }
     }
