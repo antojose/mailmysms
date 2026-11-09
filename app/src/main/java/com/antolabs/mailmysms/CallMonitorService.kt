@@ -66,7 +66,7 @@ class CallMonitorService : Service() {
         val notification: Notification = NotificationCompat.Builder(this, channelId)
             .setContentTitle("MailMySMS")
             .setContentText("Watching for call log entries")
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setSmallIcon(R.mipmap.ic_launcher_monochrome)
             .setOngoing(true)
             .setPriority(NotificationCompat.PRIORITY_MIN)
             .build()

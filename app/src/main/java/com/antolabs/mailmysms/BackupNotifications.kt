@@ -44,14 +44,14 @@ class BackupNotifications(
     private fun build(done: Int, total: Int, finished: Boolean): Notification {
         val pct = if (total > 0) (done * 100 / total) else 0
         val text = if (finished) {
-            "Backed up $done of $total $noun"
+            "Backed up ${done.grouped()} of ${total.grouped()} $noun"
         } else {
-            "Backing up $noun: $done / $total ($pct%)"
+            "Backing up $noun: ${done.grouped()} / ${total.grouped()} ($pct%)"
         }
         return NotificationCompat.Builder(service, channelId)
             .setContentTitle("MailMySMS")
             .setContentText(text)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setSmallIcon(R.mipmap.ic_launcher_monochrome)
             .setOngoing(!finished)
             .setProgress(if (total > 0) total else 100, done, total == 0)
             .setPriority(NotificationCompat.PRIORITY_LOW)

@@ -1,7 +1,9 @@
 <resources>
-    <color name="ic_launcher_background">#1565C0</color>
+    <!-- From the approved MailMySMS_Approved_Icon_Set package -->
+    <color name="mailmysms_icon_blue">#1565C0</color>
+    <color name="ic_launcher_background">@color/mailmysms_icon_blue</color>
 
-    <!-- Brand accent, matches the launcher icon's blue -->
+    <!-- Brand accent -->
     <color name="brand_primary">#1565C0</color>
     <color name="brand_on_primary">#FFFFFF</color>
     <color name="header_card_bg">#262196F3</color>
