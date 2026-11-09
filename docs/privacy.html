@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Privacy Policy — MailMySMS</title>
+  <meta name="description" content="MailMySMS privacy policy: what data the app accesses, why, and exactly where it goes.">
+  <link rel="icon" type="image/png" href="assets/img/favicon.png">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <div class="wrap policy">
+    <header class="site">
+      <img src="assets/img/logo.png" alt="MailMySMS">
+      <span class="wordmark">MailMySMS</span>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="https://github.com/antojose/mailmysms">GitHub</a>
+      </nav>
+    </header>
+
+    <a class="back-link" href="index.html">&larr; Back to MailMySMS</a>
+
+    <h1>Privacy Policy</h1>
+    <p class="updated">Last updated: November 9, 2026</p>
+
+    <p>MailMySMS ("the app") is built, maintained, and this policy is written, by one independent developer — not a company. This page explains, plainly, what data the app accesses on your device, what it does with it, and what it never does.</p>
+
+    <h2>The short version</h2>
+    <p>MailMySMS reads the SMS, MMS, RCS, and call-log data already on your phone and writes it directly into the email account you configure, over a direct, encrypted IMAP connection. There is no server operated by the developer in between. Nothing is sent anywhere except the mailbox you choose. The app's source code is public, so you can verify all of this yourself.</p>
+
+    <h2>What MailMySMS accesses, and why</h2>
+    <ul>
+      <li><strong>SMS and MMS messages</strong> (read and receive) — to forward them to your mailbox and to back up existing history.</li>
+      <li><strong>Call log</strong> — to forward call records to your mailbox.</li>
+      <li><strong>RCS messages</strong> — where your device's own messaging app stores them in a way Android exposes (gated behind the same SMS-read permission). Not every device or messaging app makes RCS history available this way; when it isn't, RCS messages are simply skipped.</li>
+      <li><strong>Phone state</strong> — to detect incoming/outgoing calls and which SIM they used, for call-log forwarding and dual-SIM labeling.</li>
+      <li><strong>Contacts</strong> — looked up locally, on-device, only to resolve a phone number to a saved contact name so the forwarded message is more readable. This lookup never leaves your device except as part of the message text written to your own mailbox.</li>
+      <li><strong>Notifications</strong> — to show you backup progress and status, required by Android for the app's background service to run.</li>
+      <li><strong>Network state and internet access</strong> — to connect to your email provider's IMAP server.</li>
+      <li><strong>Storage</strong> (on Android 9 and below only) — to write local export files to your device's Downloads folder. On newer Android versions this uses the system's scoped Downloads API instead, which needs no special permission.</li>
+    </ul>
+    <p>MailMySMS requests each permission only when the corresponding feature (live forwarding, call-log forwarding, or local export) is actually enabled — not all at once, and not for anything unrelated to what you turned on.</p>
+
+    <h2>Where your data goes</h2>
+    <p>Your email account credentials (address and app password) are encrypted on-device using Android's EncryptedSharedPreferences (AES-256), and used only to open a direct, encrypted (IMAPS) connection to the mail server you specify. Each message or call record is written straight into your mailbox as an email, using IMAP's APPEND command — the same operation an email client uses to save a draft. There is no email actually sent through SMTP, and no server run by the developer that your data passes through, is logged by, or is stored on.</p>
+    <p><strong>Local exports</strong> (an optional, separate feature) save a snapshot of your SMS/MMS/RCS and call history as XML/CSV files directly to your device's own storage. These files never leave your device unless you manually move or share them yourself.</p>
+
+    <h2>What MailMySMS does not do</h2>
+    <ul>
+      <li>It does not operate a backend server that your messages, calls, or credentials pass through.</li>
+      <li>It does not include analytics, crash-reporting, advertising, or any third-party tracking SDK.</li>
+      <li>It does not sell, rent, or share your data with any third party.</li>
+      <li>It does not require creating an account with the developer — only with your own existing email provider.</li>
+    </ul>
+
+    <h2>Your email provider</h2>
+    <p>Once a message is written to your mailbox, it is stored and processed by your email provider (e.g. Gmail) according to that provider's own privacy policy and terms — the same as any other email in your inbox. MailMySMS has no control over, and no visibility into, how your provider subsequently stores or processes that mail.</p>
+
+    <h2>Data retention and deletion</h2>
+    <p>MailMySMS itself only retains, on your device, a small local log of recent forwarding activity (for the app's own status display) and your settings — nothing is retained anywhere else. Messages already delivered to your mailbox, or files already saved by a local export, are not affected by uninstalling the app; you manage and delete those the same way you manage any other email or file.</p>
+
+    <h2>Children's privacy</h2>
+    <p>MailMySMS is not directed at children and does not knowingly collect data from children. It simply forwards SMS/call data already present on the device it's installed on, to a mailbox the device's owner configures.</p>
+
+    <h2>Open source</h2>
+    <p>MailMySMS's source code is public. If you want to verify any statement on this page against what the app actually does, read it yourself at <a href="https://github.com/antojose/mailmysms">github.com/antojose/mailmysms</a>.</p>
+
+    <h2>Changes to this policy</h2>
+    <p>If this policy changes, the updated version will be posted on this same page with a revised "Last updated" date above.</p>
+
+    <h2>Contact</h2>
+    <p>Questions about this policy or how MailMySMS handles data: <a href="mailto:antolabs.mailmysms@gmail.com">antolabs.mailmysms@gmail.com</a> or <a href="https://github.com/antojose/mailmysms/issues/new">open a GitHub issue</a>.</p>
+
+    <footer class="site">
+      <span>&copy; <span id="year"></span> antojose</span>
+      <a href="index.html">Home</a>
+      <a href="https://github.com/antojose/mailmysms">GitHub</a>
+      <span class="spacer"></span>
+    </footer>
+  </div>
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

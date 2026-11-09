@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MailMySMS — your texts and call history, backed up to your own mailbox</title>
+  <meta name="description" content="MailMySMS backs up your SMS, MMS, RCS, and call history by writing them directly into your own email account over IMAP. No backup cloud, no intermediary server — just your phone and your mailbox.">
+  <link rel="icon" type="image/png" href="assets/img/favicon.png">
+  <link rel="stylesheet" href="assets/css/style.css">
+
+  <meta property="og:title" content="MailMySMS">
+  <meta property="og:description" content="Your texts and call history, backed up directly to your own mailbox. No backup cloud, no intermediary server.">
+  <meta property="og:image" content="https://mailmysms.app/assets/img/logo.png">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://mailmysms.app/">
+  <meta name="twitter:card" content="summary">
+</head>
+<body>
+  <div class="wrap">
+    <header class="site">
+      <img src="assets/img/logo.png" alt="MailMySMS">
+      <span class="wordmark">MailMySMS</span>
+      <nav>
+        <a href="https://github.com/antojose/mailmysms">GitHub</a>
+        <a href="privacy.html">Privacy</a>
+      </nav>
+    </header>
+
+    <div class="hero">
+      <h1>Your texts and call history, backed up to your own mailbox.</h1>
+      <p class="tagline">MailMySMS connects directly to your own email account over IMAP and writes your messages and call history there. No backup cloud to sign up for. Just your phone and your mailbox.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="https://github.com/antojose/mailmysms/releases/latest">Download latest release</a>
+        <a class="btn btn-outline" href="https://github.com/antojose/mailmysms">View source on GitHub</a>
+      </div>
+    </div>
+
+    <section>
+      <h2 class="section-title">Why MailMySMS exists</h2>
+      <p>Your messages and call history are personal. Backing them up shouldn’t mean handing them over to yet another service or trusting an unfamiliar server with your data.</p>
+      <p>MailMySMS takes a simpler approach. It connects directly to your own email account and saves your messages and call history there over IMAP. No intermediary backup servers, no separate cloud account to sign up for. Just your phone and your mailbox.</p>
+      <p>It started as a personal itch — a simple way to keep SMS and call history safely archived in my own inbox. One thing led to another, and now it can back up years of messages, export them locally, and handle RCS messages where Android makes them accessible.</p>
+      <p>The idea remains the same: <span class="tagline-emphasis">your phone, your mailbox, nothing in between.</span></p>
+      <p>MailMySMS is open source, so anyone can inspect the code, understand how it works, and help make it better.</p>
+      <p>Built and maintained by one person in spare time, mostly out of curiosity and the joy of making useful little things.</p>
+    </section>
+
+    <section>
+      <h2 class="section-title">What it does</h2>
+      <div class="card">
+        <p style="margin-bottom:0">
+          Live SMS, MMS, and call-log forwarding to your inbox as things happen &middot;
+          one-time bulk backup of years of existing history &middot;
+          RCS messages where your phone's own messaging app stores them alongside SMS/MMS &middot;
+          local XML/CSV exports saved only to your device &middot;
+          no analytics, no ads, no account to create.
+        </p>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="section-title">Support</h2>
+      <p>Found a bug, have an idea, or just want to say hi? Genuine feedback — good or bad — genuinely helps. Reach out via <a href="https://github.com/antojose/mailmysms/issues/new">GitHub Issues</a> or <a href="mailto:antolabs.mailmysms@gmail.com">email</a>.</p>
+      <p>If MailMySMS makes your life a little easier, you can always fuel the next round of tinkering with a coffee.</p>
+      <div class="cta-row" style="justify-content:flex-start">
+        <a class="btn btn-outline" href="https://buymeacoffee.com/antojose">Buy me a coffee ☕</a>
+      </div>
+    </section>
+
+    <footer class="site">
+      <span>&copy; <span id="year"></span> antojose</span>
+      <a href="privacy.html">Privacy policy</a>
+      <a href="https://github.com/antojose/mailmysms">GitHub</a>
+      <span class="spacer"></span>
+    </footer>
+  </div>
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>
