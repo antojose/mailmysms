@@ -136,7 +136,7 @@
             android:layout_marginTop="4dp"
             android:textSize="13sp"
             android:alpha="0.75"
-            android:text="Good or bad, genuine feedback helps a lot." />
+            android:text="Good, bad or ugly — genuine feedback helps a lot." />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/feedbackButton"
@@ -149,9 +149,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
+            android:textStyle="bold"
+            android:text="Like what MailMySMS does for you?" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
             android:textSize="13sp"
             android:alpha="0.75"
-            android:text="Find this helpful? Buy me a coffee — it genuinely helps keep this going." />
+            android:text="If you're ever feeling generous, it helps keep this going." />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/coffeeButton"
