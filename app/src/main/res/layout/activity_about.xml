@@ -39,14 +39,14 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:lineSpacingExtra="4dp"
-            android:text="MailMySMS skips the middleman. It connects straight to your own mailbox over IMAP and writes each message there directly — nothing passes through a server we run, because we don’t run one. Your inbox is the whole app." />
+            android:text="MailMySMS skips the middleman. It connects straight to your own mailbox over IMAP and writes each message there directly — nothing passes through a server we run, because we don’t run one. No backup cloud to sign up for. Just your own mailbox." />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:lineSpacingExtra="4dp"
-            android:text="It started as a personal itch: a simple way to keep SMS and call history safely archived without handing it to a stranger’s cloud. It’s grown since — bulk backup for years of existing history, RCS support, local exports — but the core idea hasn’t changed: your phone, your mailbox, nothing in between." />
+            android:text="It started as a personal itch: a simple way to keep SMS and call history safely archived without handing it to a stranger’s cloud. It’s grown since — bulk backup for years of existing history, RCS support where your phone stores it alongside SMS/MMS, local exports — but the core idea hasn’t changed: your phone, your mailbox, nothing in between." />
 
         <TextView
             android:layout_width="wrap_content"
