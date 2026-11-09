@@ -23,7 +23,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="16dp"
             android:textSize="17sp"
             android:textStyle="bold"
             android:text="Why MailMySMS exists" />
@@ -33,41 +33,48 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:lineSpacingExtra="4dp"
-            android:text="Your texts and call log are some of the most personal data on your phone — and most “backup” apps want you to trust a company you’ve never heard of with all of it, routed through servers you can’t see." />
+            android:text="Your messages and call history are personal. Backing them up shouldn’t mean handing them over to yet another service or trusting an unfamiliar server with your data." />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:lineSpacingExtra="4dp"
-            android:text="MailMySMS skips the middleman. It connects straight to your own mailbox over IMAP and writes each message there directly — nothing passes through a server we run, because we don’t run one. No backup cloud to sign up for. Just your own mailbox." />
+            android:text="MailMySMS takes a simpler approach. It connects directly to your own email account and saves your messages and call history there over IMAP. No intermediary backup servers, no separate cloud account to sign up for. Just your phone and your mailbox." />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:lineSpacingExtra="4dp"
-            android:text="It started as a personal itch: a simple way to keep SMS and call history safely archived without handing it to a stranger’s cloud. It’s grown since — bulk backup for years of existing history, RCS support where your phone stores it alongside SMS/MMS, local exports — but the core idea hasn’t changed: your phone, your mailbox, nothing in between." />
+            android:text="It started as a personal itch — I wanted a simple way to keep my SMS and call history safely archived in my own inbox. One thing led to another, and now it can back up years of messages, export them locally, and handle RCS messages where Android makes them accessible." />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:lineSpacingExtra="4dp"
-            android:text="The code is open source, so you — or anyone — can check exactly what it does before trusting it with anything." />
+            android:text="@string/about_tagline" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:lineSpacingExtra="4dp"
-            android:text="Built and maintained by one person, in spare time. If something’s broken or missing, say so — genuine feedback, good or bad, is what keeps this useful." />
+            android:text="MailMySMS is open source, so anyone can inspect the code, understand how it works, and help make it better." />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:lineSpacingExtra="4dp"
+            android:text="Built and maintained by one person in spare time, mostly out of curiosity and the joy of making useful little things." />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/githubButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
+            android:layout_marginTop="24dp"
             android:text="View source on GitHub" />
 
         <!-- Flexible spacer: on tall screens this absorbs the leftover height so the

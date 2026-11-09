@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">MailMySMS</string>
+    <string name="about_tagline">The idea remains the same: <b>your phone, your mailbox, nothing in between.</b></string>
 </resources>
