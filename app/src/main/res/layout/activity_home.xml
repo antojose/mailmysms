@@ -146,6 +146,14 @@
             android:layout_marginTop="12dp"
             android:text="Send feedback" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:textSize="13sp"
+            android:alpha="0.75"
+            android:text="Find this helpful? Buy me a coffee — it genuinely helps keep this going." />
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/coffeeButton"
             style="@style/Widget.Material3.Button.OutlinedButton"

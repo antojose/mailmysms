@@ -9,48 +9,65 @@
         android:orientation="vertical"
         android:padding="24dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/app_name"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:textSize="13sp"
-            android:alpha="0.75"
-            android:text="SMS and Call Log mailer" />
+        <include layout="@layout/header_brand_slim" />
 
         <TextView
             android:id="@+id/versionText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="-12dp"
             android:textSize="12sp"
             android:alpha="0.6" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            android:text="Why MailMySMS exists" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:lineSpacingExtra="4dp"
+            android:text="Your texts and call log are some of the most personal data on your phone — and most “backup” apps want you to trust a company you’ve never heard of with all of it, routed through servers you can’t see." />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Forwards your SMS and call log straight into your own mailbox over IMAP — no backup service, no middleman." />
+            android:lineSpacingExtra="4dp"
+            android:text="MailMySMS skips the middleman. It connects straight to your own mailbox over IMAP and writes each message there directly — nothing passes through a server we run, because we don’t run one. Your inbox is the whole app." />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:lineSpacingExtra="4dp"
+            android:text="It started as a personal itch: a simple way to keep SMS and call history safely archived without handing it to a stranger’s cloud. It’s grown since — bulk backup for years of existing history, RCS support, local exports — but the core idea hasn’t changed: your phone, your mailbox, nothing in between." />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:lineSpacingExtra="4dp"
+            android:text="The code is open source, so you — or anyone — can check exactly what it does before trusting it with anything." />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:lineSpacingExtra="4dp"
+            android:text="Built and maintained by one person, in spare time. If something’s broken or missing, say so — genuine feedback, good or bad, is what keeps this useful." />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/githubButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="View on GitHub" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/coffeeButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="Buy me a coffee" />
+            android:layout_marginTop="28dp"
+            android:text="View source on GitHub" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/feedbackButton"
@@ -67,6 +84,22 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:text="Send feedback (Email)" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:textSize="13sp"
+            android:alpha="0.75"
+            android:text="Find this helpful? Buy me a coffee — it genuinely helps keep this going." />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/coffeeButton"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="Buy me a coffee" />
 
     </LinearLayout>
 </ScrollView>

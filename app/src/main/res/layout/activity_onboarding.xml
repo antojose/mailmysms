@@ -9,18 +9,13 @@
         android:orientation="vertical"
         android:padding="24dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Welcome to MailMySMS"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+        <include layout="@layout/header_brand_slim" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="A quick one-time setup." />
+            android:layout_marginTop="-12dp"
+            android:text="Welcome! A quick one-time setup." />
 
         <!-- 1. Email account -->
         <TextView
