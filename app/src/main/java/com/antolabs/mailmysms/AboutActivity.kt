@@ -14,6 +14,7 @@ class AboutActivity : AppCompatActivity() {
         binding.versionText.text = "by ${AppInfo.AUTHOR} · v${AppInfo.versionName(this)}"
 
         binding.githubButton.setOnClickListener { AppInfo.openUrl(this, AppInfo.GITHUB_URL) }
+        binding.privacyPolicyLink.setOnClickListener { AppInfo.openUrl(this, AppInfo.PRIVACY_POLICY_URL) }
         binding.coffeeButton.setOnClickListener { AppInfo.openUrl(this, AppInfo.COFFEE_URL) }
         binding.feedbackButton.setOnClickListener { AppInfo.showFeedbackDialog(this) }
     }

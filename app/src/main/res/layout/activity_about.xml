@@ -77,6 +77,22 @@
             android:layout_marginTop="24dp"
             android:text="View source on GitHub" />
 
+        <TextView
+            android:id="@+id/privacyPolicyLink"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="4dp"
+            android:minHeight="48dp"
+            android:gravity="center"
+            android:paddingHorizontal="12dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:textSize="13sp"
+            android:alpha="0.75"
+            android:text="Privacy policy" />
+
         <!-- Flexible spacer: on tall screens this absorbs the leftover height so the
              feedback/coffee asks below settle toward the bottom as a lightweight footer,
              without leaving dead space below the Coffee button; on short screens it

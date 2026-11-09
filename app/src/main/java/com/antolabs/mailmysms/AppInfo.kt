@@ -13,9 +13,9 @@ object AppInfo {
     const val AUTHOR = "antojose"
 
     /**
-     * Canonical privacy policy URL, for the Play Store listing and for an in-app link once the
-     * page is live. As of this writing it returns a 502 (domain registered, nothing served yet),
-     * so no screen links to this constant - wire it up once it resolves to real content.
+     * Canonical privacy policy URL, also reused for the Play Store listing. As of this writing
+     * the page itself returns a 502 (domain registered, site not live yet) - the About screen
+     * links here anyway at the user's request, pending the site going up.
      */
     const val PRIVACY_POLICY_URL = "https://mailmysms.app/privacy"
 
