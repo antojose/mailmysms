@@ -33,12 +33,26 @@ class BackupNotifications(
         private set
     @Volatile var lastTotal: Int = 0
         private set
+    /** A human status for phases with no (done/total) to report yet - e.g. "Connecting...",
+     *  "Reading message history...". Cleared once real progress starts. */
+    @Volatile var lastPhase: String? = null
+        private set
 
     fun update(done: Int, total: Int, finished: Boolean = false) {
         lastDone = done
         lastTotal = total
+        lastPhase = null
         val manager = service.getSystemService(NotificationManager::class.java)
         manager?.notify(notificationId, build(done, total, finished))
+    }
+
+    /** For setup/reading phases before there's a (done/total) to show - keeps the notification
+     *  (and the in-app status text, via lastPhase) from sitting silently at "0/0" while real work
+     *  is happening underneath. */
+    fun updatePhase(text: String) {
+        lastPhase = text
+        val manager = service.getSystemService(NotificationManager::class.java)
+        manager?.notify(notificationId, buildPhase(text))
     }
 
     private fun build(done: Int, total: Int, finished: Boolean): Notification {
@@ -54,6 +68,17 @@ class BackupNotifications(
             .setSmallIcon(R.mipmap.ic_launcher_monochrome)
             .setOngoing(!finished)
             .setProgress(if (total > 0) total else 100, done, total == 0)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .build()
+    }
+
+    private fun buildPhase(text: String): Notification {
+        return NotificationCompat.Builder(service, channelId)
+            .setContentTitle("MailMySMS")
+            .setContentText(text)
+            .setSmallIcon(R.mipmap.ic_launcher_monochrome)
+            .setOngoing(true)
+            .setProgress(100, 0, true)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .build()
     }

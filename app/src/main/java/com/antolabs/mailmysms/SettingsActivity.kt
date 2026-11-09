@@ -202,7 +202,8 @@ class SettingsActivity : AppCompatActivity() {
             tracker.importedCount(BackupTracker.TYPE_RCS, user)
         binding.smsBackupStatusText.text = if (SmsBackupService.isRunning()) {
             val (done, total) = SmsBackupService.progress()
-            if (total > 0) "Backup running… ${done * 100 / total}% (${done.grouped()}/${total.grouped()})" else "Backup running…"
+            if (total > 0) "Backup running… ${done * 100 / total}% (${done.grouped()}/${total.grouped()})"
+            else SmsBackupService.phase() ?: "Backup running…"
         } else if (count > 0) {
             "${count.grouped()} messages imported so far (safe to resume any time - already-sent ones won't be duplicated)"
         } else {
@@ -215,7 +216,8 @@ class SettingsActivity : AppCompatActivity() {
         val count = BackupTracker.get(this).importedCount(BackupTracker.TYPE_CALL, user)
         binding.callLogBackupStatusText.text = if (CallLogBackupService.isRunning()) {
             val (done, total) = CallLogBackupService.progress()
-            if (total > 0) "Backup running… ${done * 100 / total}% (${done.grouped()}/${total.grouped()})" else "Backup running…"
+            if (total > 0) "Backup running… ${done * 100 / total}% (${done.grouped()}/${total.grouped()})"
+            else CallLogBackupService.phase() ?: "Backup running…"
         } else if (count > 0) {
             "${count.grouped()} calls imported so far (safe to resume any time - already-sent ones won't be duplicated)"
         } else {

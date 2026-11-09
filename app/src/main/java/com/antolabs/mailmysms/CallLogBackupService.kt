@@ -41,9 +41,13 @@ class CallLogBackupService : Service() {
 
         var appender: ResilientAppender? = null
         try {
+            notifier.updatePhase("Connecting to your mailbox…")
             appender = ResilientAppender(TAG, gmailUser, appPassword, imapHost, imapPort, folderName)
+
+            notifier.updatePhase("Checking what's already backed up…")
             val existingMessageIds = appender.fetchExistingMessageIds()
 
+            notifier.updatePhase("Reading call log history…")
             val calls = CallLogReader.queryAll(context)
             val total = calls.size
             var done = 0
@@ -117,6 +121,7 @@ class CallLogBackupService : Service() {
 
         /** (done, total) for the run in progress, or (0, 0) if nothing is running. */
         fun progress(): Pair<Int, Int> = notifications?.let { it.lastDone to it.lastTotal } ?: (0 to 0)
+        fun phase(): String? = notifications?.lastPhase
 
         fun start(context: Context) {
             if (running) return

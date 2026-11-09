@@ -54,14 +54,24 @@ class SmsBackupService : Service() {
 
         var appender: ResilientAppender? = null
         try {
+            notifier.updatePhase("Connecting to your mailbox…")
             appender = ResilientAppender(TAG, gmailUser, appPassword, imapHost, imapPort, folderName)
+
+            notifier.updatePhase("Checking what's already backed up…")
             val existingMessageIds = appender.fetchExistingMessageIds()
 
+            notifier.updatePhase("Reading SMS history…")
             val items = mutableListOf<HistoryItem>()
             items.addAll(SmsReader.queryAll(context).map {
                 HistoryItem.Sms(it.id, it.address, it.body, it.dateMillis, it.threadId, it.subId, it.isOutgoing)
             })
-            items.addAll(MmsReader.queryAll(context).map { HistoryItem.Mms(it) })
+
+            notifier.updatePhase("Reading MMS history… this is the slow part, hang tight")
+            items.addAll(MmsReader.queryAll(context) { mmsDone ->
+                if (mmsDone % 50 == 0) notifier.updatePhase("Reading MMS history… ${mmsDone.grouped()} read so far")
+            }.map { HistoryItem.Mms(it) })
+
+            notifier.updatePhase("Reading RCS history…")
             items.addAll(ImChatReader.queryAll(context).map { HistoryItem.Rcs(it) })
             items.sortBy { it.dateMillis }
 
@@ -182,6 +192,7 @@ class SmsBackupService : Service() {
 
         /** (done, total) for the run in progress, or (0, 0) if nothing is running. */
         fun progress(): Pair<Int, Int> = notifications?.let { it.lastDone to it.lastTotal } ?: (0 to 0)
+        fun phase(): String? = notifications?.lastPhase
 
         fun start(context: Context) {
             if (running) return
