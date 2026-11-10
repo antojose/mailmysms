@@ -22,3 +22,6 @@ captures/
 
 # OS
 .DS_Store
+
+# Local dev notes / context (not for the public repo)
+.local-notes/
