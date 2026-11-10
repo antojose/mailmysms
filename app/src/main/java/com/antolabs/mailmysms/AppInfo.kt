@@ -9,7 +9,7 @@ import androidx.appcompat.app.AlertDialog
 object AppInfo {
     const val GITHUB_URL = "https://github.com/antojose/mailmysms"
     const val COFFEE_URL = "https://buymeacoffee.com/antojose"
-    const val FEEDBACK_EMAIL = "antolabs.mailmysms@gmail.com"
+    const val FEEDBACK_EMAIL = "support@mailmysms.app"
     const val AUTHOR = "antojose"
 
     /** Canonical privacy policy URL. Also reused for the Play Store listing. Served from docs/ in this repo via GitHub Pages. */
